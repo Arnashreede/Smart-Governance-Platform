@@ -1,58 +1,115 @@
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Avatar,
+  Box,
+  IconButton,
+  Badge,
+  Chip,
+} from "@mui/material";
+
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 function Header() {
+  const fullName = localStorage.getItem("fullName") || "User";
+  const email = localStorage.getItem("email") || "";
+  const role = localStorage.getItem("role") || "";
+  const userId = localStorage.getItem("userId") || "";
 
-  const role = localStorage.getItem("role");
+  const today = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   return (
-    <div style={header}>
+    <AppBar
+      position="sticky"
+      elevation={0}
+      sx={{
+        background: "#fff",
+        color: "#222",
+        borderRadius: 3,
+        mb: 3,
+      }}
+    >
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          py: 1,
+        }}
+      >
+        <Box>
+          <Typography variant="h5" fontWeight="bold">
+            👋 Welcome, {fullName}
+          </Typography>
 
-      <div>
-        <h2 style={{ margin: 0 }}>Welcome 👋</h2>
-        <p style={{ margin: 0, color: "#666" }}>
-          {role} Portal
-        </p>
-      </div>
+          <Typography variant="body2" color="text.secondary">
+            {email}
+          </Typography>
 
-      <div style={profile}>
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              gap: 1,
+              flexWrap: "wrap",
+            }}
+          >
+            <Chip
+              label={`ID : ${userId}`}
+              color="primary"
+              size="small"
+            />
 
-        <AccountCircleIcon
+            <Chip
+              label={role}
+              color="success"
+              size="small"
+            />
+
+            <Chip
+              label={today}
+              variant="outlined"
+              size="small"
+            />
+          </Box>
+        </Box>
+
+        <Box
           sx={{
-            fontSize: 45,
-            color: "#1565C0",
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
           }}
-        />
+        >
+          <IconButton>
+            <Badge badgeContent={3} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
 
-        <div>
-          <strong>{role}</strong>
-          <br />
-          Logged In
-        </div>
+          <IconButton>
+            <SettingsIcon />
+          </IconButton>
 
-      </div>
-
-    </div>
+          <Avatar
+            sx={{
+              bgcolor: "#1565C0",
+              width: 50,
+              height: 50,
+            }}
+          >
+            {fullName.charAt(0).toUpperCase()}
+          </Avatar>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
-
-const header = {
-  background: "white",
-  position: "sticky",
-  top: 0,
-  zIndex: 100,
-  padding: "20px",
-  borderRadius: "15px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  boxShadow: "0 5px 15px rgba(0,0,0,.08)",
-  marginBottom: "25px",
-};
-
-const profile = {
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-};
 
 export default Header;

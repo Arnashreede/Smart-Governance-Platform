@@ -1,25 +1,30 @@
 import { useEffect, useState } from "react";
 import {
-  Container,
+  Box,
   Typography,
-  Grid,
   Card,
   CardContent,
+  Grid,
   Chip,
-  Button,
-  Stack
+  TextField,
 } from "@mui/material";
-import DescriptionIcon from "@mui/icons-material/Description";
-import VerifiedIcon from "@mui/icons-material/Verified";
-import DownloadIcon from "@mui/icons-material/Download";
 
-import { getCitizenApplications } from "../services/applicationService";
-import { downloadCertificate } from "../services/certificateService";
+import {
+  DataGrid,
+} from "@mui/x-data-grid";
 
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
+
+import {
+  getCitizenApplications,
+} from "../services/applicationService";
 function MyApplications() {
-  const [applications, setApplications] = useState([]);
 
   const citizenId = localStorage.getItem("citizenId");
+
+  const [applications, setApplications] = useState([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadApplications();
@@ -29,125 +34,179 @@ function MyApplications() {
     try {
       const data = await getCitizenApplications(citizenId);
       setApplications(data);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "APPROVED":
-        return "success";
-      case "PENDING":
-        return "warning";
-      case "VERIFIED":
-        return "info";
-      case "REJECTED":
-        return "error";
-      default:
-        return "default";
-    }
-  };
+  const filtered = applications.filter(app =>
+    app.applicationType
+      ?.toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  const columns = [
+    {
+      field: "id",
+      headerName: "Application ID",
+      width: 120,
+    },
+    {
+      field: "applicationType",
+      headerName: "Service",
+      flex: 1,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 170,
+      renderCell: (params) => {
+        const status = params.value;
+
+        let color = "default";
+
+        if (status === "APPROVED")
+          color = "success";
+
+        if (status === "REJECTED")
+          color = "error";
+
+        if (status === "SUBMITTED")
+          color = "warning";
+
+        if (status === "VERIFIED")
+          color = "info";
+
+        return (
+          <Chip
+            label={status}
+            color={color}
+          />
+        );
+      },
+    },
+  ];
 
   return (
-    <Container sx={{ mt: 4 }}>
+    <>
+      <Sidebar />
 
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        color="primary"
-        gutterBottom
+      <Box
+        sx={{
+          ml: "270px",
+          p: 4,
+          bgcolor: "#F5F7FA",
+          minHeight: "100vh",
+        }}
       >
-        📄 My Certificate Applications
-      </Typography>
+        <Header />
 
-      <Grid container spacing={3}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          mb={3}
+        >
+          📄 My Applications
+        </Typography>
 
-        {applications.map((app) => (
+        <Grid container spacing={3} mb={3}>
 
-          <Grid item xs={12} md={6} lg={4} key={app.id}>
-
-            <Card
-              elevation={4}
-              sx={{
-                borderRadius: 3,
-                transition: "0.3s",
-                "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: 8
-                }
-              }}
-            >
-
+          <Grid item xs={12} md={3}>
+            <Card>
               <CardContent>
-
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={2}
-                >
-                  <Typography variant="h6">
-                    <DescriptionIcon sx={{ mr: 1 }} />
-                    {app.applicationType}
-                  </Typography>
-
-                  <Chip
-                    label={app.status}
-                    color={getStatusColor(app.status)}
-                  />
-                </Stack>
-
-                <Typography>
-                  <strong>Application ID:</strong> {app.id}
+                <Typography variant="h5">
+                  {applications.length}
                 </Typography>
 
                 <Typography>
-                  <strong>Certificate No:</strong>{" "}
-                  {app.certificateNumber || "Not Generated"}
+                  Total Applications
                 </Typography>
-
-                <Typography sx={{ mt: 1 }}>
-                  <strong>Status:</strong> {app.status}
-                </Typography>
-
-                <Stack spacing={1} sx={{ mt: 3 }}>
-
-                  {app.status === "APPROVED" ? (
-
-                    <Button
-                      variant="contained"
-                      startIcon={<DownloadIcon />}
-                      onClick={() => downloadCertificate(app.id)}
-                    >
-                      Download Certificate
-                    </Button>
-
-                  ) : (
-
-                    <Button
-                      variant="outlined"
-                      startIcon={<VerifiedIcon />}
-                      disabled
-                    >
-                      Waiting for Approval
-                    </Button>
-
-                  )}
-
-                </Stack>
-
               </CardContent>
-
             </Card>
-
           </Grid>
 
-        ))}
+          <Grid item xs={12} md={3}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5">
+                  {
+                    applications.filter(
+                      a => a.status === "APPROVED"
+                    ).length
+                  }
+                </Typography>
 
-      </Grid>
+                <Typography>
+                  Approved
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
 
-    </Container>
+          <Grid item xs={12} md={3}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5">
+                  {
+                    applications.filter(
+                      a => a.status === "SUBMITTED"
+                    ).length
+                  }
+                </Typography>
+
+                <Typography>
+                  Pending
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5">
+                  {
+                    applications.filter(
+                      a => a.status === "REJECTED"
+                    ).length
+                  }
+                </Typography>
+
+                <Typography>
+                  Rejected
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+        </Grid>
+
+        <TextField
+          fullWidth
+          label="Search Application"
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          sx={{ mb: 3 }}
+        />
+
+        <div
+          style={{
+            background: "white",
+            borderRadius: 15,
+          }}
+        >
+          <DataGrid
+            rows={filtered}
+            columns={columns}
+            autoHeight
+            pageSizeOptions={[5, 10, 20]}
+          />
+        </div>
+
+      </Box>
+    </>
   );
 }
 

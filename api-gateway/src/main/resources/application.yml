@@ -4,29 +4,69 @@ spring:
 
   cloud:
     gateway:
-      mvc:
-        routes:
-          - id: user-service
-            uri: lb://USER-SERVICE
-            predicates:
-              - Path=/auth/**
-              - Path=/users/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
 
-          - id: citizen-service
-            uri: lb://CITIZEN-SERVICE
-            predicates:
-              - Path=/citizens/**
+      routes:
+        - id: auth-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/auth/**
 
-          - id: officer-service
-            uri: lb://OFFICER-SERVICE
-            predicates:
-              - Path=/officers/**
+        - id: users-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/**
 
-          - id: grievance-service
-            uri: lb://GRIEVANCE-SERVICE
-            predicates:
-              - Path=/grievances/**
+        - id: department-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/departments/**
 
+        - id: citizen-service
+          uri: lb://CITIZEN-SERVICE
+          predicates:
+            - Path=/citizens/**
+
+        - id: officer-service
+          uri: lb://OFFICER-SERVICE
+          predicates:
+            - Path=/officers/**
+
+        - id: grievance-service
+          uri: lb://GRIEVANCE-SERVICE
+          predicates:
+            - Path=/grievances/**
+
+        - id: welfare-service
+          uri: lb://WELFARE-SERVICE
+          predicates:
+            - Path=/welfare/**,/applications/**,/schemes/**
+
+        - id: reporting-service
+          uri: lb://REPORTING-SERVICE
+          predicates:
+            - Path=/reports/**
+
+        - id: certificate-service
+          uri: lb://CERTIFICATE-SERVICE
+          predicates:
+            - Path=/certificates/**
+        - id: budget-service
+          uri: lb://BUDGET-SERVICE
+          predicates:
+            - Path=/budgets/**
 server:
   port: 8080
 
@@ -35,8 +75,18 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG

@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
@@ -22,40 +23,48 @@ public class JwtService {
 
         return Jwts.builder()
                 .subject(username)
-                .claim("role", role)          // Store role in JWT
+                .claim("role", role)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .expiration(new Date(System.currentTimeMillis() + + 30L * 24 * 60 * 60 * 1000))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Extract Username
-    public String extractUsername(String token) {
+    // Extract All Claims
+    private Claims extractClaims(String token) {
 
-        Claims claims = Jwts.parser()
-                .verifyWith((javax.crypto.SecretKey) key)
+        return Jwts.parser()
+                .verifyWith((SecretKey) key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
 
-        return claims.getSubject();
+    // Extract Username
+    public String extractUsername(String token) {
+        return extractClaims(token).getSubject();
     }
 
     // Extract Role
     public String extractRole(String token) {
-
-        Claims claims = Jwts.parser()
-                .verifyWith((javax.crypto.SecretKey) key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-
-        return claims.get("role", String.class);
+        return extractClaims(token).get("role", String.class);
     }
 
-    // Validate Token
-    public boolean validateToken(String token, String username) {
+    // Check Expiration
+    public boolean isTokenExpired(String token) {
+        return extractClaims(token)
+                .getExpiration()
+                .before(new Date());
+    }
 
-        return extractUsername(token).equals(username);
+    // Validate Token (Simple)
+    public boolean validateToken(String token) {
+        return !isTokenExpired(token);
+    }
+
+    // Validate Token Against Username
+    public boolean validateToken(String token, String username) {
+        return extractUsername(token).equals(username)
+                && !isTokenExpired(token);
     }
 }

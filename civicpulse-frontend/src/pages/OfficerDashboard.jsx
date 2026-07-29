@@ -1,213 +1,283 @@
-import { useEffect, useState } from "react";
-import Header from "../components/Header";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Button,
+} from "@mui/material";
+
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import CancelIcon from "@mui/icons-material/Cancel";
+import DescriptionIcon from "@mui/icons-material/Description";
+
+import { useNavigate } from "react-router-dom";
+
 import Sidebar from "../components/Sidebar";
-import { getOfficerGrievances } from "../services/officerDashboardService";
-import { updateStatus } from "../services/statusService";
-import { updateRemarks } from "../services/remarksService";
+import Header from "../components/Header";
+
 function OfficerDashboard() {
 
-    const [grievances, setGrievances] = useState([]);
+  const navigate = useNavigate();
 
-    const officerName = localStorage.getItem("officerName");
+  const fullName = localStorage.getItem("fullName") || "Officer";
+  const email = localStorage.getItem("email") || "";
+  const role = localStorage.getItem("role") || "";
+  const officerId = localStorage.getItem("userId") || "";
 
-    useEffect(() => {
-        loadGrievances();
-    }, []);
+  return (
+    <>
+      <Sidebar />
 
-    const loadGrievances = async () => {
-        try {
-            const data = await getOfficerGrievances(officerName);
-            setGrievances(data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+      <Box
+        sx={{
+          ml: "270px",
+          p: 4,
+          minHeight: "100vh",
+          bgcolor: "#F5F7FA",
+        }}
+      >
+        <Header />
 
-    const handleStatusUpdate = async (id, status) => {
-        try {
-            await updateStatus(id, status);
-            alert("Status updated successfully");
-            loadGrievances();
-        } catch (error) {
-            console.error(error);
-            alert("Failed to update status");
-        }
-    };
+        {/* Profile Card */}
 
-    return (
-        <>
-            <Sidebar />
+        <Card
+          sx={{
+            mb: 4,
+            borderRadius: 4,
+            background:
+              "linear-gradient(135deg,#0D47A1,#42A5F5)",
+            color: "white",
+          }}
+        >
+          <CardContent
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box>
 
-            <div style={{ marginLeft: "270px", padding: "20px" }}>
-                <Header />
-            </div>
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+              >
+                Welcome, {fullName}
+              </Typography>
 
-            <div style={container}>
+              <Typography>
+                Officer ID : {officerId}
+              </Typography>
 
-                <h1>👮 Officer Dashboard</h1>
+              <Typography>
+                {email}
+              </Typography>
 
-                <p style={{ color: "#666" }}>
-                    Welcome to CivicPulse Nexus Officer Portal
-                </p>
+              <Typography>
+                {role}
+              </Typography>
 
-                <div style={cards}>
+            </Box>
 
-                    <div style={summaryCard}>
-                        <h2>📋</h2>
-                        <h3>Assigned Complaints</h3>
-                        <h1>{grievances.length}</h1>
-                    </div>
+            <Avatar
+              sx={{
+                width: 90,
+                height: 90,
+                bgcolor: "white",
+                color: "#1565C0",
+                fontSize: 35,
+              }}
+            >
+              {fullName.charAt(0)}
+            </Avatar>
 
-                    <div style={summaryCard}>
-                        <h2>⏳</h2>
-                        <h3>Pending</h3>
-                        <h1>
-                            {grievances.filter(g => g.status === "PENDING").length}
-                        </h1>
-                    </div>
+          </CardContent>
+        </Card>
 
-                    <div style={summaryCard}>
-                        <h2>🔄</h2>
-                        <h3>In Progress</h3>
-                        <h1>
-                            {grievances.filter(g => g.status === "IN_PROGRESS").length}
-                        </h1>
-                    </div>
+        {/* Statistics */}
 
-                    <div style={summaryCard}>
-                        <h2>✅</h2>
-                        <h3>Resolved</h3>
-                        <h1>
-                            {grievances.filter(g => g.status === "RESOLVED").length}
-                        </h1>
-                    </div>
+        <Grid container spacing={3}>
 
-                </div>
+          <Grid item xs={12} md={3}>
+            <DashboardCard
+              title="Assigned"
+              value="25"
+              icon={<AssignmentIcon />}
+            />
+          </Grid>
 
-                <h2 style={{ marginTop: "40px" }}>
-                    Assigned Complaints
-                </h2>
+          <Grid item xs={12} md={3}>
+            <DashboardCard
+              title="Verified"
+              value="15"
+              icon={<VerifiedIcon />}
+            />
+          </Grid>
 
-                <table
-                    border="1"
-                    cellPadding="10"
-                    style={{
-                        width: "100%",
-                        marginTop: "20px",
-                        borderCollapse: "collapse",
-                        background: "white",
-                    }}
-                >
-                    <thead>
-                        <tr>
-    <th>ID</th>
-    <th>Title</th>
-    <th>Category</th>
-    <th>Priority</th>
-    <th>Status</th>
-    <th>Remarks</th>
-    <th>Change Status</th>
-    <th>Save</th>
-</tr>
-                    </thead>
+          <Grid item xs={12} md={3}>
+            <DashboardCard
+              title="Pending"
+              value="7"
+              icon={<PendingActionsIcon />}
+            />
+          </Grid>
 
-                    <tbody>
-    {grievances.map((g) => (
-        <tr key={g.id}>
-            <td>{g.id}</td>
-            <td>{g.title}</td>
-            <td>{g.category}</td>
-            <td>{g.priority}</td>
+          <Grid item xs={12} md={3}>
+            <DashboardCard
+              title="Rejected"
+              value="3"
+              icon={<CancelIcon />}
+            />
+          </Grid>
 
-            <td>{g.status}</td>
+        </Grid>
 
-            <td>
-                <input
-                    type="text"
-                    placeholder="Enter remarks"
-                    defaultValue={g.remarks}
-                    id={`remarks-${g.id}`}
-                    style={{
-                        width: "180px",
-                        padding: "6px",
-                    }}
-                />
-            </td>
+        {/* Quick Actions */}
 
-            <td>
-                <select
-                    defaultValue={g.status}
-                    id={`status-${g.id}`}
-                >
-                    <option value="PENDING">PENDING</option>
-                    <option value="IN_PROGRESS">IN PROGRESS</option>
-                    <option value="RESOLVED">RESOLVED</option>
-                    <option value="CLOSED">CLOSED</option>
-                </select>
-            </td>
-
-            <td>
-                <button
-    onClick={async () => {
-
-        const status =
-            document.getElementById(`status-${g.id}`).value;
-
-        const remarks =
-            document.getElementById(`remarks-${g.id}`).value;
-
-        try {
-
-            await updateStatus(g.id, status);
-            await updateRemarks(g.id, remarks);
-
-            alert("Grievance updated successfully");
-
-            loadGrievances();
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert("Failed to update grievance");
-        }
-
-    }}
+        <Typography
+  variant="h5"
+  fontWeight="bold"
+  sx={{ mt: 5, mb: 3 }}
 >
-    Save
-</button>
-            </td>
-        </tr>
-    ))}
-</tbody>
+  Officer Services
+</Typography>
 
-                </table>
+<Grid container spacing={3}>
 
-            </div>
-        </>
-    );
+  <Grid item xs={12} md={4}>
+    <ActionCard
+      icon="📄"
+      title="Pending Applications"
+      description="Review, verify and approve citizen applications."
+      buttonText="View Applications"
+      onClick={() => navigate("/applications")}
+    />
+  </Grid>
+
+  <Grid item xs={12} md={4}>
+    <ActionCard
+      icon="⚠️"
+      title="Assigned Complaints"
+      description="Resolve complaints assigned to you."
+      buttonText="Open Complaints"
+      onClick={() => navigate("/assigned-grievances")}
+    />
+  </Grid>
+
+  <Grid item xs={12} md={4}>
+    <ActionCard
+      icon="🏅"
+      title="Issue Certificates"
+      description="Generate certificates for approved applications."
+      buttonText="Issue Certificate"
+      onClick={() => navigate("/certificates")}
+    />
+  </Grid>
+
+</Grid>
+
+      </Box>
+    </>
+  );
 }
 
-const container = {
-    marginLeft: "270px",
-    padding: "40px",
-    background: "#F4F6F9",
-    minHeight: "100vh",
-};
+function DashboardCard({ title, value, icon }) {
 
-const cards = {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-    gap: "20px",
-    marginTop: "30px",
-};
+  return (
+    <Card
+      sx={{
+        borderRadius: 4,
+        boxShadow: 3,
+      }}
+    >
+      <CardContent
+        sx={{ textAlign: "center" }}
+      >
+        <Box
+          sx={{
+            color: "#1565C0",
+            fontSize: 45,
+          }}
+        >
+          {icon}
+        </Box>
 
-const summaryCard = {
-    background: "white",
-    padding: "25px",
-    borderRadius: "15px",
-    textAlign: "center",
-    boxShadow: "0 5px 15px rgba(0,0,0,.1)",
-};
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+        >
+          {value}
+        </Typography>
+
+        <Typography color="text.secondary">
+          {title}
+        </Typography>
+
+      </CardContent>
+    </Card>
+  );
+}
+
+function ActionCard({
+  icon,
+  title,
+  description,
+  buttonText,
+  onClick,
+}) {
+  return (
+    <Card
+      sx={{
+        borderRadius: 4,
+        height: "100%",
+        transition: ".3s",
+        "&:hover": {
+          transform: "translateY(-6px)",
+          boxShadow: 8,
+        },
+      }}
+    >
+      <CardContent sx={{ textAlign: "center", py: 5 }}>
+
+        <Typography
+          sx={{
+            fontSize: 55,
+            mb: 2,
+          }}
+        >
+          {icon}
+        </Typography>
+
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          gutterBottom
+        >
+          {title}
+        </Typography>
+
+        <Typography
+          color="text.secondary"
+          sx={{ mb: 3 }}
+        >
+          {description}
+        </Typography>
+
+        <Button
+          variant="contained"
+          onClick={onClick}
+        >
+          {buttonText}
+        </Button>
+
+      </CardContent>
+    </Card>
+  
+  );
+}
 
 export default OfficerDashboard;

@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { adminLogin } from "../services/adminAuthService";
-import { getOfficerByUsername } from "../services/officerService";
 
 function OfficerLogin() {
 
   const navigate = useNavigate();
 
   const [login, setLogin] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -24,24 +23,18 @@ function OfficerLogin() {
     try {
 
       const data = await adminLogin(
-        login.username,
+        login.email,
         login.password
       );
+
       console.log(data);
 
-      // Save login details
+      // Save Login Details
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-
-      // Save officer username
-      localStorage.setItem("username", login.username);
-      const officer = await getOfficerByUsername(login.username);
-
-localStorage.setItem("officerName", officer.fullName);
-      // Save userId if backend sends it
-      if (data.userId) {
-        localStorage.setItem("userId", data.userId);
-      }
+      localStorage.setItem("userId", data.id);
+      localStorage.setItem("email", data.email);
+      localStorage.setItem("fullName", data.fullName);
 
       if (data.role === "OFFICER") {
         navigate("/officer-dashboard");
@@ -50,7 +43,15 @@ localStorage.setItem("officerName", officer.fullName);
       }
 
     } catch (error) {
-      alert("Invalid Username or Password");
+
+      console.error(error);
+
+      if (error.response) {
+        alert(error.response.data?.message || "Invalid Email or Password");
+      } else {
+        alert("Unable to connect to server.");
+      }
+
     }
 
   };
@@ -79,9 +80,9 @@ localStorage.setItem("officerName", officer.fullName);
           <h2>Officer Login</h2>
 
           <input
-            name="username"
-            placeholder="Username"
-            value={login.username}
+            name="email"
+            placeholder="Official Email"
+            value={login.email}
             onChange={handleChange}
             style={input}
           />
@@ -101,6 +102,20 @@ localStorage.setItem("officerName", officer.fullName);
           >
             Login
           </button>
+
+          <Link
+            to="/officer-register"
+            style={{
+              display: "block",
+              marginTop: "15px",
+              textAlign: "center",
+              textDecoration: "none",
+              color: "#1976D2",
+              fontWeight: "bold",
+            }}
+          >
+            Register as Officer
+          </Link>
 
           <Link
             to="/"

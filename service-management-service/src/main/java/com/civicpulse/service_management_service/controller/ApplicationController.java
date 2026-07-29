@@ -1,21 +1,24 @@
 package com.civicpulse.service_management_service.controller;
 
 import com.civicpulse.service_management_service.entity.Application;
+import com.civicpulse.service_management_service.entity.Document;
 import com.civicpulse.service_management_service.service.ApplicationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/applications")
-@CrossOrigin(origins = "http://localhost:5173")
+
 public class ApplicationController {
 
     @Autowired
@@ -46,64 +49,78 @@ public class ApplicationController {
         return applicationService.approveApplication(id);
     }
 
-  
+    @PutMapping("/{id}/verify")
+    public Application verifyApplication(@PathVariable Long id) {
+        return applicationService.verifyApplication(id);
+    }
+
+    @PutMapping("/{id}/reject")
+    public Application rejectApplication(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+
+        return applicationService.rejectApplication(id, body.get("remarks"));
+    }
 
     @DeleteMapping("/{id}")
     public String deleteApplication(@PathVariable Long id) {
-
         applicationService.deleteApplication(id);
-
         return "Application deleted successfully";
     }
-    @PutMapping("/{id}/verify")
-public Application verifyApplication(@PathVariable Long id) {
 
-    return applicationService.verifyApplication(id);
-}
-@GetMapping("/{id}/certificate")
-public Application getCertificate(@PathVariable Long id) {
-    return applicationService.getApplicationById(id);
-}
+    @GetMapping("/{id}/certificate")
+    public Application getCertificate(@PathVariable Long id) {
+        return applicationService.getApplicationById(id);
+    }
 
-@GetMapping("/status/{status}")
-public List<Application> getApplicationsByStatus(
-        @PathVariable String status) {
+    @GetMapping("/status/{status}")
+    public List<Application> getApplicationsByStatus(@PathVariable String status) {
+        return applicationService.getApplicationsByStatus(status);
+    }
 
-    return applicationService.getApplicationsByStatus(status);
-}
+    @GetMapping("/type/{type}")
+    public List<Application> getApplicationsByType(@PathVariable String type) {
+        return applicationService.getApplicationsByType(type);
+    }
 
-@GetMapping("/type/{type}")
-public List<Application> getApplicationsByType(
-        @PathVariable String type) {
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<Application> uploadDocument(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) throws IOException {
 
-    return applicationService.getApplicationsByType(type);
-}
-@PostMapping("/{id}/upload")
-public ResponseEntity<Application> uploadDocument(
-        @PathVariable Long id,
-        @RequestParam("file") MultipartFile file) throws IOException {
+        Application application = applicationService.uploadDocument(id, file);
+        return ResponseEntity.ok(application);
+    }
 
-    Application application = applicationService.uploadDocument(id, file);
+    @GetMapping("/document/{documentId}")
+    public ResponseEntity<Resource> viewDocument(@PathVariable Long documentId) throws IOException {
 
-    return ResponseEntity.ok(application);
-}
+        Resource resource = applicationService.getDocument(documentId);
 
-@GetMapping("/{id}/document")
-public ResponseEntity<Resource> viewDocument(@PathVariable Long id) throws IOException {
+        String contentType = "application/octet-stream";
 
-    Resource resource = applicationService.getDocument(id);
+        if (resource.getFilename() != null) {
+            String name = resource.getFilename().toLowerCase();
 
-    return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .header(HttpHeaders.CONTENT_DISPOSITION,
-                    "inline; filename=\"" + resource.getFilename() + "\"")
-            .body(resource);
-}
-@PutMapping("/{id}/reject")
-public Application rejectApplication(
-        @PathVariable Long id,
-        @RequestParam String reason) {
+            if (name.endsWith(".pdf")) {
+                contentType = "application/pdf";
+            } else if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
+                contentType = "image/jpeg";
+            } else if (name.endsWith(".png")) {
+                contentType = "image/png";
+            }
+        }
 
-    return applicationService.rejectApplication(id, reason);
-}
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
+    @GetMapping("/{id}/documents")
+    public List<Document> getDocuments(@PathVariable Long id) {
+        return applicationService.getDocuments(id);
+    }
 }

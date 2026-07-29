@@ -42,7 +42,7 @@ if (exists) {
     );
 }
 List<OfficerDTO> officers =
-        officerClient.getOfficersByDepartment(grievance.getCategory());
+        officerClient.getOfficersByDepartment(grievance.getDepartment());
 
 if (!officers.isEmpty()) {
 

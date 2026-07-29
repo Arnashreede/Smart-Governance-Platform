@@ -9,8 +9,9 @@ public class Officer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true)
-private String username;
+    private String officerId;
 
     private String fullName;
 
@@ -23,17 +24,24 @@ private String username;
     private String department;
 
     private String designation;
-private String password;
 
-private boolean active = true;
+    private String password;
+
+    private boolean active = true;
+
     public Officer() {
     }
 
-    public Officer(Long id, String fullName, String email,
-                   String phone, String department,
+    public Officer(Long id,
+                   String officerId,
+                   String fullName,
+                   String email,
+                   String phone,
+                   String department,
                    String designation) {
 
         this.id = id;
+        this.officerId = officerId;
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
@@ -46,7 +54,15 @@ private boolean active = true;
     }
 
     public void setId(Long id) {
-        this.id=id;
+        this.id = id;
+    }
+
+    public String getOfficerId() {
+        return officerId;
+    }
+
+    public void setOfficerId(String officerId) {
+        this.officerId = officerId;
     }
 
     public String getFullName() {
@@ -54,7 +70,7 @@ private boolean active = true;
     }
 
     public void setFullName(String fullName) {
-        this.fullName=fullName;
+        this.fullName = fullName;
     }
 
     public String getEmail() {
@@ -62,7 +78,7 @@ private boolean active = true;
     }
 
     public void setEmail(String email) {
-        this.email=email;
+        this.email = email;
     }
 
     public String getPhone() {
@@ -70,7 +86,7 @@ private boolean active = true;
     }
 
     public void setPhone(String phone) {
-        this.phone=phone;
+        this.phone = phone;
     }
 
     public String getDepartment() {
@@ -78,35 +94,30 @@ private boolean active = true;
     }
 
     public void setDepartment(String department) {
-        this.department=department;
+        this.department = department;
     }
 
     public String getDesignation() {
         return designation;
     }
-public String getUsername() {
-    return username;
-}
 
-public void setUsername(String username) {
-    this.username = username;
-}
     public void setDesignation(String designation) {
-        this.designation=designation;
+        this.designation = designation;
     }
-public String getPassword() {
-    return password;
-}
 
-public void setPassword(String password) {
-    this.password = password;
-}
+    public String getPassword() {
+        return password;
+    }
 
-public boolean isActive() {
-    return active;
-}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-public void setActive(boolean active) {
-    this.active = active;
-}
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

@@ -1,137 +1,311 @@
-import { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  Button,
+} from "@mui/material";
+import api from "../api/axios";
+import PeopleIcon from "@mui/icons-material/People";
+import BadgeIcon from "@mui/icons-material/Badge";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import DescriptionIcon from "@mui/icons-material/Description";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 
-import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
+
 import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 import DashboardCharts from "../components/DashboardCharts";
+import { useEffect, useState } from "react";
 
-import { getDashboardCounts } from "../services/dashboardService";
-import { getAllGrievances } from "../services/grievanceService";
 
 function Dashboard() {
 
-  const [counts, setCounts] = useState({
-  totalCitizens: 0,
-  totalOfficers: 0,
-  totalGrievances: 0,
-  pending: 0,
-  totalCertificates: 0,
+  const navigate = useNavigate();
+
+  const fullName = localStorage.getItem("fullName") || "Administrator";
+  const email = localStorage.getItem("email") || "";
+  const role = localStorage.getItem("role") || "";
+const [stats, setStats] = useState({
+
+  citizens: 0,
+  officers: 0,
+  departments: 0,
+  complaints: 0,
+  certificates: 0,
+  reports: 0,
 });
+const [grievances, setGrievances] = useState([]);
+useEffect(() => {
+  Promise.all([
+    api.get("/citizens"),
+    api.get("/officers"),
+    api.get("/departments"),
+    api.get("/grievances"),
+    api.get("/certificates"),
+    api.get("/reports/dashboard"),
+    api.get("/reports/citizens/count"),
+  ])
+    .then(([c, o, d, g, ce]) => {
 
-  const [grievances, setGrievances] = useState([]);
+  setGrievances(g.data);
 
-  useEffect(() => {
-    loadDashboard();
-    loadGrievances();
-  }, []);
+  setStats({
+    citizens: c.data.length,
+    officers: o.data.length,
+    departments: d.data.length,
+    complaints: g.data.length,
+    certificates: ce.data.length,
+    reports: 0,
+  });
 
-  const loadDashboard = async () => {
-    try {
-      const data = await getDashboardCounts();
-      setCounts(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const loadGrievances = async () => {
-    try {
-      const data = await getAllGrievances();
-      setGrievances(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+})
+.catch(console.error);
+}, []);
   return (
     <>
       <Sidebar />
 
       <Box
         sx={{
-          ml: "260px",
+          ml: "270px",
           p: 4,
-          background: "#F4F6F9",
+          background: "#F5F7FA",
           minHeight: "100vh",
         }}
       >
         <Header />
 
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          mt={3}
+        {/* Welcome Banner */}
+
+        <Card
+          sx={{
+            mb: 4,
+            borderRadius: 4,
+            background:
+              "linear-gradient(135deg,#0D47A1,#1976D2)",
+            color: "white",
+          }}
         >
-          🏛 Government Dashboard
-        </Typography>
+          <CardContent
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box>
 
-        <Typography
-          color="text.secondary"
-          mb={4}
-        >
-          Welcome to CivicPulse Nexus Administration Portal
-        </Typography>
+              <Typography variant="h4" fontWeight="bold">
+                Government Administration Portal
+              </Typography>
 
-        <div style={cards}>
+              <Typography mt={1}>
+                Welcome, {fullName}
+              </Typography>
 
-          <div style={card}>
-            <h2>👤 Citizens</h2>
-            <h1>{counts.totalCitizens}</h1>
-            <p>Registered Citizens</p>
-          </div>
+              <Typography>
+                {email}
+              </Typography>
 
-          <div style={card}>
-            <h2>👮 Officers</h2>
-            <h1>{counts.totalOfficers}</h1>
-            <p>Government Officers</p>
-          </div>
+              <Typography>
+                {role}
+              </Typography>
 
-          <div style={card}>
-            <h2>📋 Complaints</h2>
-            <h1>{counts.totalGrievances}</h1>
-            <p>Total Complaints</p>
-          </div>
+            </Box>
 
-          <div style={card}>
-            <h2>⏳ Pending</h2>
-            <h1>{counts.pending}</h1>
-            <p>Pending Cases</p>
-          </div>
-<div style={card}>
-  <h2>📄 Certificates</h2>
-  <h1>{counts.totalCertificates}</h1>
-  <p>Issued Certificates</p>
-</div>
-        </div>
+            <Avatar
+              sx={{
+                width: 90,
+                height: 90,
+                bgcolor: "white",
+                color: "#1565C0",
+                fontSize: 35,
+              }}
+            >
+              {fullName.charAt(0)}
+            </Avatar>
+
+          </CardContent>
+        </Card>
+
+        {/* Statistics */}
+
+        <Grid container spacing={3}>
+
+<Grid size={{ xs: 12, md: 2 }}>
+              <StatCard
+              title="Citizens"
+              value={stats.citizens}
+              icon={<PeopleIcon />}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 2 }}>
+              <StatCard
+              title="Officers"
+              value={stats.officers}
+              icon={<BadgeIcon />}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 2 }}>
+              <StatCard
+              title="Departments"
+              value={stats.departments}
+              icon={<ApartmentIcon />}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 2 }}>
+              <StatCard
+              title="Complaints"
+              value={stats.complaints}
+              icon={<ReportProblemIcon />}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 2 }}>
+              <StatCard
+              title="Certificates"
+              value={stats.certificates}
+              icon={<DescriptionIcon />}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 2 }}>
+              <StatCard
+              title="Reports"
+              value={stats.reports}
+              icon={<AssessmentIcon />}
+            />
+          </Grid>
+
+        </Grid>
+
+        {/* Quick Actions */}
 
         <Typography
           variant="h5"
           fontWeight="bold"
-          mt={6}
+          mt={5}
           mb={3}
         >
-          📊 Analytics
+          Quick Actions
+        </Typography>
+
+        <Grid container spacing={3}>
+
+<Grid size={{ xs: 12, md: 4 }}>
+              <ActionCard
+              title="Manage Citizens"
+              onClick={() => navigate("/citizens")}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 4 }}>
+              <ActionCard
+              title="Manage Officers"
+              onClick={() => navigate("/officers")}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 4 }}>
+              <ActionCard
+              title="Departments"
+              onClick={() => navigate("/departments")}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 4 }}>
+              <ActionCard
+              title="Complaints"
+              onClick={() => navigate("/grievances")}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 4 }}>
+              <ActionCard
+              title="Assign Officer"
+              onClick={() => navigate("/assign-officer")}
+            />
+          </Grid>
+
+<Grid size={{ xs: 12, md: 4 }}>
+              <ActionCard
+              title="Reports"
+              onClick={() => navigate("/reports")}
+            />
+          </Grid>
+
+        </Grid>
+
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          mt={5}
+          mb={3}
+        >
+          System Analytics
         </Typography>
 
         <DashboardCharts grievances={grievances} />
-
       </Box>
     </>
   );
 }
 
-const cards = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-  gap: "20px",
-};
+function StatCard({ title, value, icon }) {
+  return (
+    <Card sx={{ borderRadius: 4, boxShadow: 3 }}>
+      <CardContent sx={{ textAlign: "center" }}>
+        <Box sx={{ color: "#1565C0", fontSize: 45 }}>
+          {icon}
+        </Box>
 
-const card = {
-  background: "white",
-  borderRadius: "15px",
-  padding: "25px",
-  textAlign: "center",
-  boxShadow: "0 5px 15px rgba(0,0,0,.1)",
-};
+        <Typography variant="h4" fontWeight="bold">
+          {value}
+        </Typography>
+
+        <Typography color="text.secondary">
+          {title}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ActionCard({ title, onClick }) {
+  return (
+    <Card
+      sx={{
+        borderRadius: 4,
+        cursor: "pointer",
+        transition: ".3s",
+        "&:hover": {
+          transform: "translateY(-5px)",
+        },
+      }}
+    >
+      <CardContent sx={{ textAlign: "center" }}>
+        <Typography variant="h6" fontWeight="bold">
+          {title}
+        </Typography>
+
+        <Button
+          sx={{ mt: 2 }}
+          variant="contained"
+          onClick={onClick}
+        >
+          Open
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default Dashboard;

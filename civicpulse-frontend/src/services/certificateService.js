@@ -10,16 +10,30 @@ export const getCertificateById = async (id) => {
     return response.data;
 };
 
-export const downloadCertificate = (id) => {
-    window.open(`http://localhost:8089/certificates/${id}/download`, "_blank");
-};
-
 export const verifyCertificate = async (certificateNumber) => {
     const response = await api.get(`/certificates/verify/${certificateNumber}`);
     return response.data;
-    
 };
+
 export const getCertificatesByCitizen = async (citizenId) => {
     const response = await api.get(`/certificates/citizen/${citizenId}`);
     return response.data;
+};
+
+export const downloadCertificate = async (id) => {
+    const response = await api.get(`/certificates/${id}/download`, {
+        responseType: "blob",
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "certificate.pdf";
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
 };

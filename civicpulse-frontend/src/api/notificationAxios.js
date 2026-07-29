@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const notificationApi = axios.create({
-  baseURL: "http://localhost:8087",
+  baseURL: "http://localhost:8080",
 });
 
 notificationApi.interceptors.request.use((config) => {

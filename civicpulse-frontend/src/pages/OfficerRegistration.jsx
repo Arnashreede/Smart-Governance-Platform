@@ -1,137 +1,234 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { registerOfficer } from "../services/officerService";
+import { getDepartments } from "../services/departmentService";
 
 function OfficerRegistration() {
 
-  const [officer, setOfficer] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    department: "",
-    designation: "",
-  });
+    const [departments, setDepartments] = useState([]);
 
-  const handleChange = (e) => {
-    setOfficer({
-      ...officer,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async () => {
-    try {
-
-      await registerOfficer(officer);
-
-      alert("Officer Registered Successfully");
-
-      setOfficer({
+    const [officer, setOfficer] = useState({
         fullName: "",
         email: "",
         phone: "",
-        department: "",
+        departmentId: "",
         designation: "",
-      });
+        password: "",
+        confirmPassword: ""
+    });
 
-    } catch (error) {
+    useEffect(() => {
+        loadDepartments();
+    }, []);
 
-      if (error.response) {
-        alert(error.response.data.message);
-      } else {
-        alert("Registration Failed");
-      }
-    }
-  };
+    const loadDepartments = async () => {
+        try {
+            const response = await getDepartments();
 
-  return (
-    <>
-      <Navbar />
+            // If your service already returns response.data
+            setDepartments(response);
 
-      <div style={containerStyle}>
+            // If it returns Axios response instead, use:
+            // setDepartments(response.data);
 
-        <h2>Officer Registration</h2>
+        } catch (error) {
+            console.error(error);
+            alert("Failed to load departments");
+        }
+    };
 
-        <input
-          name="fullName"
-          placeholder="Full Name"
-          value={officer.fullName}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+    const handleChange = (e) => {
+        setOfficer({
+            ...officer,
+            [e.target.name]: e.target.value
+        });
+    };
 
-        <input
-          name="email"
-          placeholder="Email"
-          value={officer.email}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+    const handleSubmit = async () => {
 
-        <input
-          name="phone"
-          placeholder="Phone Number"
-          value={officer.phone}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+        if (officer.password !== officer.confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
 
-        <select
-          name="department"
-          value={officer.department}
-          onChange={handleChange}
-          style={inputStyle}
-        >
-          <option value="">Select Department</option>
-          <option>Water</option>
-          <option>Electricity</option>
-          <option>Road</option>
-          <option>Health</option>
-          <option>Sanitation</option>
-        </select>
+        try {
 
-        <input
-          name="designation"
-          placeholder="Designation"
-          value={officer.designation}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+            const response = await registerOfficer({
+                fullName: officer.fullName,
+                email: officer.email,
+                phone: officer.phone,
+                designation: officer.designation,
+                departmentId: Number(officer.departmentId),
+                role: "OFFICER",
+                password: officer.password
+            });
 
-        <button
-          onClick={handleSubmit}
-          style={buttonStyle}
-        >
-          Register Officer
-        </button>
+            alert(
+                "Officer Registered Successfully!\n\nOfficer ID : "
+                + (response.officerId || response.id)
+            );
 
-      </div>
-    </>
-  );
+            setOfficer({
+                fullName: "",
+                email: "",
+                phone: "",
+                departmentId: "",
+                designation: "",
+                password: "",
+                confirmPassword: ""
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            if (error.response) {
+                alert(error.response.data.message || "Registration Failed");
+            } else {
+                alert("Registration Failed");
+            }
+
+        }
+    };
+
+    return (
+        <>
+            <Navbar />
+
+            <div style={containerStyle}>
+
+                <h2 style={{ textAlign: "center" }}>
+                    Officer Registration
+                </h2>
+
+                <input
+                    type="text"
+                    name="fullName"
+                    placeholder="Full Name"
+                    value={officer.fullName}
+                    onChange={handleChange}
+                    style={inputStyle}
+                />
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Official Email"
+                    value={officer.email}
+                    onChange={handleChange}
+                    style={inputStyle}
+                />
+
+                <input
+                    type="text"
+                    name="phone"
+                    placeholder="Phone Number"
+                    value={officer.phone}
+                    onChange={handleChange}
+                    style={inputStyle}
+                />
+
+                <select
+                    name="departmentId"
+                    value={officer.departmentId}
+                    onChange={handleChange}
+                    style={inputStyle}
+                >
+                    <option value="">Select Department</option>
+
+                    {departments.map((department) => (
+                        <option
+                            key={department.id}
+                            value={department.id}
+                        >
+                            {department.name}
+                        </option>
+                    ))}
+
+                </select>
+
+                <select
+                    name="designation"
+                    value={officer.designation}
+                    onChange={handleChange}
+                    style={inputStyle}
+                >
+                    <option value="">Select Designation</option>
+                    <option value="Department Manager">
+                        Department Manager
+                    </option>
+                    <option value="Senior Officer">
+                        Senior Officer
+                    </option>
+                    <option value="Officer">
+                        Officer
+                    </option>
+                    <option value="Junior Officer">
+                        Junior Officer
+                    </option>
+                    <option value="Trainee Officer">
+                        Trainee Officer
+                    </option>
+                </select>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    value={officer.password}
+                    onChange={handleChange}
+                    style={inputStyle}
+                />
+
+                <input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    value={officer.confirmPassword}
+                    onChange={handleChange}
+                    style={inputStyle}
+                />
+
+                <button
+                    onClick={handleSubmit}
+                    style={buttonStyle}
+                >
+                    Register Officer
+                </button>
+
+            </div>
+        </>
+    );
 }
 
 const containerStyle = {
-  maxWidth: "500px",
-  margin: "40px auto",
-  background: "white",
-  padding: "30px",
-  borderRadius: "10px",
-  boxShadow: "0 5px 15px rgba(0,0,0,.1)",
+    maxWidth: "500px",
+    margin: "40px auto",
+    background: "white",
+    padding: "30px",
+    borderRadius: "10px",
+    boxShadow: "0 5px 15px rgba(0,0,0,.1)"
 };
 
 const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "15px",
+    width: "100%",
+    padding: "12px",
+    marginBottom: "15px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "15px",
+    boxSizing: "border-box"
 };
 
 const buttonStyle = {
-  width: "100%",
-  padding: "12px",
-  background: "#1565C0",
-  color: "white",
-  border: "none",
-  cursor: "pointer",
+    width: "100%",
+    padding: "12px",
+    background: "#1565C0",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "16px"
 };
 
 export default OfficerRegistration;

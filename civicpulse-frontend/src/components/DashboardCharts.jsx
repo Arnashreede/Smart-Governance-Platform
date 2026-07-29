@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-function DashboardCharts({ grievances }) {
+function DashboardCharts({ grievances = [] }) {
 
   const categoryData = {};
 

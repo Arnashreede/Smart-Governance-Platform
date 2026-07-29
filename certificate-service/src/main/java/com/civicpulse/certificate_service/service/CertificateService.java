@@ -19,4 +19,6 @@ ResponseEntity<byte[]> downloadCertificate(Long id) throws Exception;
     CertificateResponse getCertificateByCertificateNumber(
         String certificateNumber);
         long getCertificateCount();
-}
+        List<CertificateResponse> getCertificatesByCitizenId(Long citizenId);
+ResponseEntity<byte[]> previewCertificate(Long applicationId) throws Exception;
+    }

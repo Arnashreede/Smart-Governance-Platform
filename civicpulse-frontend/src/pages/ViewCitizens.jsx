@@ -1,20 +1,30 @@
 import { useEffect, useState } from "react";
 import {
   Box,
-  Paper,
+  Card,
+  CardContent,
+  Grid,
   Typography,
+  Avatar,
   TextField,
-  InputAdornment,
   Chip,
+  IconButton,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+
 import { DataGrid } from "@mui/x-data-grid";
+
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PeopleIcon from "@mui/icons-material/People";
 
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+
 import { getAllCitizens } from "../services/citizenService";
 
 function ViewCitizens() {
+
   const [citizens, setCitizens] = useState([]);
   const [search, setSearch] = useState("");
 
@@ -25,51 +35,33 @@ function ViewCitizens() {
   const loadCitizens = async () => {
     try {
       const data = await getAllCitizens();
-
-      // Normalize rows for DataGrid
-      const rows = (Array.isArray(data) ? data : []).map((citizen, index) => ({
-        id: citizen.id ?? citizen.citizenId ?? index + 1,
-        fullName: citizen.fullName ?? "",
-        email: citizen.email ?? "",
-        phone: citizen.phone ?? "",
-        aadhaarNumber: citizen.aadhaarNumber ?? "",
-        address: citizen.address ?? "",
-      }));
-
-      console.log(rows);
-
-      setCitizens(rows);
-    } catch (error) {
-      console.error(error);
+      setCitizens(data);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const filteredCitizens = citizens.filter((citizen) =>
-    (
-      citizen.fullName +
-      citizen.email +
-      citizen.phone +
-      citizen.address
-    )
-      .toLowerCase()
+  const filtered = citizens.filter((citizen) =>
+    citizen.fullName
+      ?.toLowerCase()
       .includes(search.toLowerCase())
   );
 
   const columns = [
     {
       field: "id",
-      headerName: "ID",
-      width: 90,
+      headerName: "Citizen ID",
+      width: 120,
     },
     {
       field: "fullName",
-      headerName: "Citizen Name",
+      headerName: "Full Name",
       flex: 1,
     },
     {
       field: "email",
       headerName: "Email",
-      flex: 1.3,
+      flex: 1,
     },
     {
       field: "phone",
@@ -77,84 +69,107 @@ function ViewCitizens() {
       width: 150,
     },
     {
-      field: "aadhaarNumber",
-      headerName: "Aadhaar",
-      width: 180,
+      field: "status",
+      headerName: "Status",
+      width: 130,
+      renderCell: () => (
+        <Chip
+          label="Active"
+          color="success"
+        />
+      ),
     },
     {
-      field: "address",
-      headerName: "Address",
-      flex: 1,
-      renderCell: (params) => (
-        <Chip
-          label={params.value || "N/A"}
-          size="small"
-          color="primary"
-          variant="outlined"
-        />
+      field: "actions",
+      headerName: "Actions",
+      width: 180,
+      sortable: false,
+      renderCell: () => (
+        <>
+          <IconButton color="primary">
+            <VisibilityIcon />
+          </IconButton>
+
+          <IconButton color="warning">
+            <EditIcon />
+          </IconButton>
+
+          <IconButton color="error">
+            <DeleteIcon />
+          </IconButton>
+        </>
       ),
     },
   ];
 
   return (
-    <>
-      <Sidebar />
+  <>
+    <Sidebar />
 
-      <Box
-        sx={{
-          ml: "260px",
-          p: 4,
-          background: "#F4F6F9",
-          minHeight: "100vh",
-        }}
+    <Box
+      sx={{
+        ml: "270px",
+        p: 4,
+        bgcolor: "#F5F7FA",
+        minHeight: "100vh",
+      }}
+    >
+      <Header />
+
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        mb={3}
       >
-        <Header />
+        👥 Citizen Management
+      </Typography>
 
-        <Paper
-          elevation={3}
-          sx={{
-            mt: 3,
-            p: 3,
-            borderRadius: 3,
-          }}
-        >
-          <Typography variant="h4" fontWeight="bold" mb={3}>
-            👤 Registered Citizens
-          </Typography>
+      <Grid container spacing={3} mb={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <Card sx={{ borderRadius: 4 }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <PeopleIcon
+                sx={{
+                  fontSize: 45,
+                  color: "#1565C0",
+                }}
+              />
 
-          <TextField
-            fullWidth
-            placeholder="Search Citizen..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ mb: 3 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+              >
+                {citizens.length}
+              </Typography>
 
+              <Typography>
+                Registered Citizens
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <TextField
+        fullWidth
+        label="Search Citizen"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        sx={{ mb: 3 }}
+      />
+
+      <Card sx={{ borderRadius: 4 }}>
+        <CardContent>
           <DataGrid
-            rows={filteredCitizens}
+            rows={filtered}
             columns={columns}
             autoHeight
             pageSizeOptions={[5, 10, 20]}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
-            disableRowSelectionOnClick
           />
-        </Paper>
-      </Box>
-    </>
-  );
+        </CardContent>
+      </Card>
+    </Box>
+  </>
+);
 }
-
 export default ViewCitizens;

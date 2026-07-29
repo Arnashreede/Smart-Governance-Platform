@@ -29,37 +29,69 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Allow login and registration without JWT
+        System.out.println("========== JWT FILTER ==========");
+        System.out.println("Path: " + request.getServletPath());
+
         String path = request.getServletPath();
 
-        if (path.startsWith("/auth")) {
+        // Public endpoints
+        if (path.startsWith("/auth")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
+        System.out.println("Authorization Header: " + authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
             try {
 
                 String token = authHeader.substring(7);
+                System.out.println("JWT Token: " + token);
+
+                if (!jwtService.validateToken(token)) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Invalid JWT Token");
+                    return;
+                }
 
                 String username = jwtService.extractUsername(token);
+                String role = jwtService.extractRole(token);
+
+                System.out.println("Username: " + username);
+                System.out.println("Role: " + role);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 username,
                                 null,
-                                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
+                System.out.println("Authentication Successful");
+                System.out.println("Authentication: " +
+                        SecurityContextHolder.getContext().getAuthentication());
+
             } catch (JwtException e) {
 
+                e.printStackTrace();
+
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid JWT Token");
+                response.getWriter().write("JWT Error: " + e.getMessage());
+                return;
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Authentication Failed");
                 return;
             }
         }

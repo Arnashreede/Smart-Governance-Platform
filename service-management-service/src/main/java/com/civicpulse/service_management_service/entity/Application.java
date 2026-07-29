@@ -1,7 +1,11 @@
 package com.civicpulse.service_management_service.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "applications")
@@ -17,10 +21,13 @@ public class Application {
 
     private String applicationType;
 
-    // Uploaded document details
-    private String documentName;
-    private String documentType;
-    private String documentPath;
+    @JsonManagedReference
+    @OneToMany(
+            mappedBy = "application",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private List<Document> documents = new ArrayList<>();
 
     // Application status
     private String status;
@@ -76,28 +83,12 @@ public class Application {
         this.applicationType = applicationType;
     }
 
-    public String getDocumentName() {
-        return documentName;
+    public List<Document> getDocuments() {
+        return documents;
     }
 
-    public void setDocumentName(String documentName) {
-        this.documentName = documentName;
-    }
-
-    public String getDocumentType() {
-        return documentType;
-    }
-
-    public void setDocumentType(String documentType) {
-        this.documentType = documentType;
-    }
-
-    public String getDocumentPath() {
-        return documentPath;
-    }
-
-    public void setDocumentPath(String documentPath) {
-        this.documentPath = documentPath;
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 
     public String getStatus() {

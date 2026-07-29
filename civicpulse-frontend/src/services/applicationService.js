@@ -24,11 +24,8 @@ export const getAllApplications = async () => {
     const response = await applicationApi.get("/applications");
     return response.data;
 };
-export const viewDocument = (id) => {
-    window.open(
-        `http://localhost:8088/applications/${id}/document`,
-        "_blank"
-    );
+export const getDocumentPreviewUrl = (documentId) => {
+    return `http://localhost:8088/applications/document/${documentId}`;
 };
 
 export const approveApplication = async (id) => {
@@ -84,6 +81,6 @@ export const uploadDocument = async (id, file) => {
             },
         }
     );
-
     return response.data;
 };
+export const getApplicationsByCitizen = getCitizenApplications;

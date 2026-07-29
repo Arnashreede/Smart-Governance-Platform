@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
+
 public class AuthController {
 
     private final UserService userService;
@@ -24,7 +24,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
-        return userService.login(request);
-    }
+public LoginResponse login(@RequestBody LoginRequest request) {
+
+    System.out.println("===== LOGIN REQUEST RECEIVED =====");
+    System.out.println("Email: " + request.getEmail());
+
+    return userService.login(request);
+}
+
 }

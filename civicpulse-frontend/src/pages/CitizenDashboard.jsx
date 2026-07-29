@@ -1,139 +1,253 @@
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  Button,
+} from "@mui/material";
+
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import DescriptionIcon from "@mui/icons-material/Description";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+
 import { useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
-import Header from "../components/Header";
+
 import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 
 function CitizenDashboard() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    return (
-        <>
-            <Sidebar />
+  const fullName = localStorage.getItem("fullName") || "Citizen";
+  const email = localStorage.getItem("email") || "";
+  const citizenId = localStorage.getItem("citizenId") || "";
 
-            <div style={{ marginLeft: "270px", padding: "20px" }}>
-                <Header />
-            </div>
+  return (
+    <>
+      <Sidebar />
 
-            <div style={container}>
-                <h1>👤 Citizen Dashboard</h1>
+      <Box
+        sx={{
+          ml: "270px",
+          p: 4,
+          background: "#F5F7FA",
+          minHeight: "100vh",
+        }}
+      >
+        <Header />
 
-                <p style={{ color: "#666" }}>
-                    Welcome to CivicPulse Nexus Citizen Portal
-                </p>
+        {/* Welcome Card */}
 
-                <div style={cards}>
+        <Card
+          sx={{
+            mb: 4,
+            borderRadius: 4,
+            background:
+              "linear-gradient(135deg,#1565C0,#42A5F5)",
+            color: "white",
+          }}
+        >
+          <CardContent
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box>
+              <Typography variant="h4" fontWeight="bold">
+                Welcome, {fullName}
+              </Typography>
 
-                    {/* Register Complaint */}
-                    <div style={card}>
-                        <h2>📋</h2>
-                        <h3>Register Complaint</h3>
+              <Typography>
+                Citizen ID : {citizenId}
+              </Typography>
 
-                        <button
-                            style={button}
-                            onClick={() => navigate("/grievance/register")}
-                        >
-                            Open
-                        </button>
-                    </div>
+              <Typography>
+                {email}
+              </Typography>
+            </Box>
 
-                    {/* My Complaints */}
-                    <div style={card}>
-                        <h2>📄</h2>
-                        <h3>My Complaints</h3>
+            <Avatar
+              sx={{
+                width: 80,
+                height: 80,
+                bgcolor: "white",
+                color: "#1565C0",
+                fontSize: 35,
+                fontWeight: "bold",
+              }}
+            >
+              {fullName.charAt(0)}
+            </Avatar>
+          </CardContent>
+        </Card>
 
-                        <button
-                            style={button}
-                            onClick={() => navigate("/grievances")}
-                        >
-                            View
-                        </button>
-                    </div>
+        {/* Statistics */}
 
-                    {/* Track Status */}
-                    <div style={card}>
-                        <h2>📍</h2>
-                        <h3>Track Status</h3>
+        <Grid container spacing={3}>
 
-                        <button
-                            style={button}
-                            onClick={() => navigate("/grievances")}
-                        >
-                            Track
-                        </button>
-                    </div>
+          <Grid item xs={12} md={3}>
+            <StatCard
+              icon={<AssignmentIcon />}
+              title="Applications"
+              value="12"
+            />
+          </Grid>
 
-                    {/* Certificates */}
-                    <div style={card}>
-                        <h2>📜</h2>
-                        <h3>Certificates</h3>
+          <Grid item xs={12} md={3}>
+            <StatCard
+              icon={<DescriptionIcon />}
+              title="Certificates"
+              value="6"
+            />
+          </Grid>
 
-                        <Button
-                            variant="contained"
-                            onClick={() => navigate("/certificates")}
-                        >
-                            View Certificates
-                        </Button>
-                    </div>
+          <Grid item xs={12} md={3}>
+            <StatCard
+              icon={<ReportProblemIcon />}
+              title="Complaints"
+              value="4"
+            />
+          </Grid>
 
-                    {/* Apply Certificate */}
-                    <div style={card}>
-                        <h2>📑</h2>
-                        <h3>Certificate / Permit</h3>
+          <Grid item xs={12} md={3}>
+            <StatCard
+              icon={<PendingActionsIcon />}
+              title="Pending"
+              value="2"
+            />
+          </Grid>
 
-                        <button
-                            style={button}
-                            onClick={() => navigate("/citizen/application")}
-                        >
-                            Apply
-                        </button>
-                    </div>
+        </Grid>
 
-                    {/* My Profile */}
-                    <div style={card}>
-                        <h2>👤</h2>
-                        <h3>My Profile</h3>
+        {/* Quick Services */}
 
-                        <button style={button}>
-                            Coming Soon
-                        </button>
-                    </div>
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          mt={5}
+          mb={3}
+        >
+          Quick Services
+        </Typography>
 
-                </div>
-            </div>
-        </>
-    );
+        <Grid container spacing={3}>
+
+          <Grid item xs={12} md={3}>
+            <ServiceCard
+              title="Apply Certificate"
+              onClick={() =>
+                navigate("/citizen/application")
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <ServiceCard
+              title="Register Complaint"
+              onClick={() =>
+                navigate("/grievance/register")
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <ServiceCard
+              title="Track Complaint"
+              onClick={() =>
+                navigate("/track-complaint")
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <ServiceCard
+              title="My Applications"
+              onClick={() =>
+                navigate("/my-applications")
+              }
+            />
+          </Grid>
+
+        </Grid>
+
+      </Box>
+    </>
+  );
 }
 
-const container = {
-    marginLeft: "270px",
-    padding: "40px",
-    background: "#F4F6F9",
-    minHeight: "100vh",
-};
+function StatCard({ icon, title, value }) {
+  return (
+    <Card
+      sx={{
+        borderRadius: 4,
+        boxShadow: 3,
+      }}
+    >
+      <CardContent
+        sx={{ textAlign: "center" }}
+      >
+        <Box
+          sx={{
+            fontSize: 45,
+            color: "#1565C0",
+          }}
+        >
+          {icon}
+        </Box>
 
-const cards = {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "20px",
-    marginTop: "30px",
-};
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+        >
+          {value}
+        </Typography>
 
-const card = {
-    background: "white",
-    padding: "30px",
-    borderRadius: "15px",
-    textAlign: "center",
-    boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
-};
+        <Typography color="text.secondary">
+          {title}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+}
 
-const button = {
-    marginTop: "20px",
-    padding: "12px 20px",
-    background: "#1565C0",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-};
+function ServiceCard({ title, onClick }) {
+  return (
+    <Card
+      sx={{
+        borderRadius: 4,
+        cursor: "pointer",
+        transition: ".3s",
+        "&:hover": {
+          transform: "translateY(-5px)",
+        },
+      }}
+      onClick={onClick}
+    >
+      <CardContent
+        sx={{ textAlign: "center" }}
+      >
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+        >
+          {title}
+        </Typography>
+
+        <Button
+          endIcon={<ArrowForwardIcon />}
+          sx={{ mt: 2 }}
+        >
+          Open
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default CitizenDashboard;

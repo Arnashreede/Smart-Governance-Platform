@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/officers")
-@CrossOrigin(origins = "http://localhost:5173")
 public class OfficerController {
 
     private final OfficerService officerService;
@@ -31,9 +30,12 @@ public class OfficerController {
     public Officer getOfficer(@PathVariable Long id) {
         return officerService.getOfficer(id);
     }
-    @GetMapping("/username/{username}")
-public Officer getOfficerByUsername(@PathVariable String username) {
-    return officerService.getOfficerByUsername(username);
+    @GetMapping("/officerId/{officerId}")
+public Officer getOfficerByOfficerId(
+        @PathVariable String officerId) {
+
+    return officerService.getOfficerByOfficerId(officerId);
+
 }
 
     @DeleteMapping("/{id}")

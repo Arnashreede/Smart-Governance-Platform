@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/certificates")
-@CrossOrigin(origins = "*")
+
 public class CertificateController {
 
     private final CertificateService certificateService;
@@ -88,5 +88,11 @@ public ResponseEntity<List<CertificateResponse>> getCertificatesByCitizen(
 
     return ResponseEntity.ok(
             certificateService.getCertificatesByCitizenId(citizenId));
+}
+@GetMapping("/{id}/preview")
+public ResponseEntity<byte[]> previewCertificate(
+        @PathVariable Long id) throws Exception {
+
+    return certificateService.previewCertificate(id);
 }
 }

@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.civicpulse.service_management_service.dto.CertificateRequest;
 import com.civicpulse.service_management_service.dto.CertificateResponse;
-
+import com.civicpulse.service_management_service.entity.Document;
+import com.civicpulse.service_management_service.repository.DocumentRepository;
 import java.util.List;
 import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,8 @@ import org.springframework.web.client.RestTemplate;
 public class ApplicationService {
 @Autowired
 private RestTemplate restTemplate;
+@Autowired
+private DocumentRepository documentRepository;
     @Autowired
     private ApplicationRepository applicationRepository;
     @Value("${file.upload-dir}")
@@ -80,9 +83,12 @@ public List<Application> getApplicationsByType(String applicationType) {
 
     return applicationRepository.findByApplicationType(applicationType);
 }
-    
-   // Approve application
-// Approve application
+ public List<Document> getDocuments(Long applicationId) {
+
+    return documentRepository.findByApplicationId(applicationId);
+
+}   
+   
 public Application approveApplication(Long id) {
 
     System.out.println("Approve application called for ID: " + id);
@@ -183,24 +189,31 @@ public Application uploadDocument(Long id, MultipartFile file) throws IOExceptio
 
     String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
+    Path filePath = uploadPath.resolve(fileName);
+
     Files.copy(
             file.getInputStream(),
-            uploadPath.resolve(fileName),
+            filePath,
             StandardCopyOption.REPLACE_EXISTING
     );
 
-    application.setDocumentName(fileName);
-    application.setDocumentType(file.getContentType());
-    application.setDocumentPath(uploadPath.resolve(fileName).toString());
+    Document document = new Document();
 
-    return applicationRepository.save(application);
+    document.setApplication(application);
+    document.setDocumentName(file.getOriginalFilename());
+    document.setDocumentType(file.getContentType());
+    document.setDocumentPath(filePath.toString());
+
+    documentRepository.save(document);
+
+    return application;
 }
-public Resource getDocument(Long id) throws IOException {
+public Resource getDocument(Long documentId) throws IOException {
 
-    Application application = applicationRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Application not found"));
+    Document document = documentRepository.findById(documentId)
+            .orElseThrow(() -> new RuntimeException("Document not found"));
 
-    Path path = Paths.get(application.getDocumentPath());
+    Path path = Paths.get(document.getDocumentPath());
 
     return new UrlResource(path.toUri());
 }

@@ -1,90 +1,171 @@
 import { useEffect, useState } from "react";
-import { Button } from "@mui/material";
 import {
-  getCertificatesByCitizen,
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  TextField,
+  Chip,
+} from "@mui/material";
+
+import DownloadIcon from "@mui/icons-material/Download";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VerifiedIcon from "@mui/icons-material/Verified";
+
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
+
+import {
+  getAllCertificates,
   downloadCertificate,
 } from "../services/certificateService";
 
 function ViewCertificates() {
+
   const [certificates, setCertificates] = useState([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadCertificates();
   }, []);
 
- const loadCertificates = async () => {
-  try {
-    const citizenId = localStorage.getItem("citizenId");
+  const loadCertificates = async () => {
+    try {
+      const data = await getAllCertificates();
+      setCertificates(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    const data = await getCertificatesByCitizen(citizenId);
-    setCertificates(data);
-  } catch (error) {
-    console.error("Error loading certificates:", error);
-  }
-};
+  const filtered = certificates.filter((c) =>
+    c.certificateType
+      ?.toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Certificates</h2>
+    <>
+      <Sidebar />
 
-      <table
-        border="1"
-        cellPadding="10"
-        style={{
-          borderCollapse: "collapse",
-          width: "100%",
-          textAlign: "center",
+      <Box
+        sx={{
+          ml: "270px",
+          p: 4,
+          bgcolor: "#F5F7FA",
+          minHeight: "100vh",
         }}
       >
-        <thead>
-          <tr>
-            <th>Certificate ID</th>
-            <th>Certificate No</th>
-            <th>Application ID</th>
-            <th>Citizen ID</th>
-            <th>Citizen Name</th>
-            <th>Department</th>
-            <th>Service</th>
-            <th>Officer ID</th>
-            <th>Officer Name</th>
-            <th>Issue Date</th>
-            <th>Valid Till</th>
-            <th>Verification Code</th>
-            <th>Download</th>
-          </tr>
-        </thead>
+        <Header />
 
-        <tbody>
-          {certificates.map((certificate) => (
-            <tr key={certificate.certificateId}>
-              <td>{certificate.certificateId}</td>
-              <td>{certificate.certificateNumber}</td>
-              <td>{certificate.applicationId}</td>
-              <td>{certificate.citizenId}</td>
-              <td>{certificate.citizenName}</td>
-              <td>{certificate.departmentName}</td>
-              <td>{certificate.serviceName}</td>
-              <td>{certificate.officerId}</td>
-              <td>{certificate.officerName}</td>
-              <td>{certificate.issueDate}</td>
-              <td>{certificate.validTill}</td>
-              <td>{certificate.verificationCode}</td>
-              <td>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() =>
-                    downloadCertificate(certificate.certificateId)
-                  }
-                >
-                  Download PDF
-                </Button>
-              </td>
-            </tr>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          mb={3}
+        >
+          📜 My Certificates
+        </Typography>
+
+        <TextField
+          fullWidth
+          label="Search Certificate"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{ mb: 4 }}
+        />
+
+        <Grid container spacing={3}>
+
+          {filtered.map((certificate) => (
+
+            <Grid
+              item
+              xs={12}
+              md={6}
+              lg={4}
+              key={certificate.id}
+            >
+
+              <Card
+                sx={{
+                  borderRadius: 4,
+                  boxShadow: 3,
+                }}
+              >
+
+                <CardContent>
+
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                  >
+                    {certificate.certificateType}
+                  </Typography>
+
+                  <Typography mt={1}>
+                    Certificate No
+                  </Typography>
+
+                  <Typography color="primary">
+                    {certificate.certificateNumber}
+                  </Typography>
+
+                  <Typography mt={2}>
+                    Application ID :
+                    {certificate.applicationId}
+                  </Typography>
+
+                  <Chip
+                    icon={<VerifiedIcon />}
+                    label="Verified"
+                    color="success"
+                    sx={{ mt: 2 }}
+                  />
+
+                  <Box
+                    sx={{
+                      mt: 3,
+                      display: "flex",
+                      gap: 2,
+                    }}
+                  >
+
+                    <Button
+                      variant="outlined"
+                      startIcon={<VisibilityIcon />}
+                    >
+                      Preview
+                    </Button>
+
+                    <Button
+                      variant="contained"
+                      startIcon={<DownloadIcon />}
+                      onClick={() =>
+                        downloadCertificate(
+                          certificate.id
+                        )
+                      }
+                    >
+                      Download
+                    </Button>
+
+                  </Box>
+
+                </CardContent>
+
+              </Card>
+
+            </Grid>
+
           ))}
-        </tbody>
-      </table>
-    </div>
+
+        </Grid>
+
+      </Box>
+
+    </>
   );
 }
 

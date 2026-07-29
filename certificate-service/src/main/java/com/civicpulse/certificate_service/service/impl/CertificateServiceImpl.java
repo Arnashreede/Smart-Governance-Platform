@@ -106,15 +106,26 @@ public class CertificateServiceImpl implements CertificateService {
     // FIXED DOWNLOAD METHOD
     // ============================
   @Override
-public ResponseEntity<byte[]> downloadCertificate(Long applicationId) throws Exception {
-
-    System.out.println("Download called with applicationId = " + applicationId);
+public ResponseEntity<byte[]> previewCertificate(Long applicationId) throws Exception {
 
     Certificate certificate = repository.findByApplicationId(applicationId)
-            .orElseThrow(() -> new RuntimeException(
-                    "Certificate not found for applicationId = " + applicationId));
+            .orElseThrow(() ->
+                    new RuntimeException("Certificate not found"));
 
-    System.out.println("Found certificate: " + certificate.getCertificateId());
+    byte[] pdf = PdfGenerator.generateCertificate(certificate);
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                    "inline; filename=certificate.pdf")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdf);
+}
+@Override
+public ResponseEntity<byte[]> downloadCertificate(Long id) throws Exception {
+
+    Certificate certificate = repository.findByApplicationId(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Certificate not found"));
 
     byte[] pdf = PdfGenerator.generateCertificate(certificate);
 

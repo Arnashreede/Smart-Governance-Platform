@@ -1,31 +1,31 @@
 package com.civicpulse.user_service.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.web.cors.CorsConfiguration;
+//import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+//import org.springframework.web.filter.CorsFilter;
 
-import java.util.List;
+//import java.util.List;
 
-@Configuration
-public class CorsConfig {
+//@Configuration
+//public class CorsConfig {
 
-    @Bean
-    public CorsFilter corsFilter() {
+    //@Bean
+    //public CorsFilter corsFilter() {
 
-        CorsConfiguration config = new CorsConfiguration();
+        //CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowedMethods(List.of("*"));
+        //config.setAllowCredentials(true);
+        //config.setAllowedOrigins(List.of("http://localhost:5173"));
+        //config.setAllowedHeaders(List.of("*"));
+        //config.setAllowedMethods(List.of("*"));
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        //UrlBasedCorsConfigurationSource source =
+                //new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**", config);
+        //source.registerCorsConfiguration("/**", config);
 
-        return new CorsFilter(source);
-    }
-}
+        //return new CorsFilter(source);
+   // }
+//}
