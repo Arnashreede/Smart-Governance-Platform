@@ -123,15 +123,17 @@ public ResponseEntity<byte[]> previewCertificate(Long applicationId) throws Exce
 @Override
 public ResponseEntity<byte[]> downloadCertificate(Long id) throws Exception {
 
-    Certificate certificate = repository.findByApplicationId(id)
+    Certificate certificate = repository.findById(id)
             .orElseThrow(() ->
                     new RuntimeException("Certificate not found"));
 
     byte[] pdf = PdfGenerator.generateCertificate(certificate);
 
     return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION,
-                    "attachment; filename=certificate.pdf")
+            .header(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=certificate.pdf"
+            )
             .contentType(MediaType.APPLICATION_PDF)
             .body(pdf);
 }

@@ -7,14 +7,36 @@ import java.util.List;
 
 public interface WelfareSchemeService {
 
+    // Create Scheme
     WelfareResponse createScheme(WelfareRequest request);
 
-    WelfareResponse updateScheme(Long id,WelfareRequest request);
+    // Update Scheme
+    WelfareResponse updateScheme(Long id, WelfareRequest request);
 
+    // Get Scheme by Database ID
     WelfareResponse getScheme(Long id);
 
+    // Get Scheme by Scheme Code
+    WelfareResponse getSchemeByCode(String schemeCode);
+
+    // Get All Schemes
     List<WelfareResponse> getAllSchemes();
 
-    void deleteScheme(Long id);
+    // Get Active Schemes
+    List<WelfareResponse> getActiveSchemes();
 
+    // Get Schemes by Category
+    List<WelfareResponse> getSchemesByCategory(String category);
+
+    // Get Schemes by Department
+    List<WelfareResponse> getSchemesByDepartment(String department);
+
+    // Activate Scheme
+    WelfareResponse activateScheme(Long id);
+
+    // Deactivate Scheme
+    WelfareResponse deactivateScheme(Long id);
+
+    // Delete Scheme
+    void deleteScheme(Long id);
 }

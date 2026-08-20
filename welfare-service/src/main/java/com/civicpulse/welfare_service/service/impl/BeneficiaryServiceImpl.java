@@ -8,7 +8,8 @@ import com.civicpulse.welfare_service.repository.WelfareSchemeRepository;
 import com.civicpulse.welfare_service.service.BeneficiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import com.civicpulse.welfare_service.event.BenefitIssuedEvent;
+import com.civicpulse.welfare_service.kafka.WelfareEventProducer;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +19,8 @@ import java.util.List;
 public class BeneficiaryServiceImpl implements BeneficiaryService {
 
     private final BeneficiaryRepository beneficiaryRepository;
-    private final WelfareSchemeRepository schemeRepository;
+private final WelfareSchemeRepository schemeRepository;
+private final WelfareEventProducer welfareEventProducer;
 
     @Override
     public List<BeneficiaryResponse> getAllBeneficiaries() {
@@ -62,12 +64,30 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
                 ? BigDecimal.ZERO
                 : beneficiary.getBenefitAmount();
 
-        scheme.setUtilizedBudget(currentUtilized.add(benefitAmount));
+        scheme.setUtilizedBudget(
+        currentUtilized.add(benefitAmount)
+);
 
-        schemeRepository.save(scheme);
-        beneficiaryRepository.save(beneficiary);
+schemeRepository.save(scheme);
+beneficiaryRepository.save(beneficiary);
 
-        return map(beneficiary);
+// =========================================================
+// PUBLISH BENEFIT ISSUED EVENT
+// =========================================================
+
+BenefitIssuedEvent event =
+        new BenefitIssuedEvent(
+                beneficiary.getId(),
+                beneficiary.getCitizenId(),
+                beneficiary.getWelfareApplication().getId(),
+                scheme.getBudgetId(),
+                scheme.getSchemeName(),
+                benefitAmount.doubleValue()
+        );
+
+welfareEventProducer.publishBenefitIssued(event);
+
+return map(beneficiary);
     }
 
     private BeneficiaryResponse map(Beneficiary beneficiary) {

@@ -13,9 +13,9 @@ export const getAllGrievances = async () => {
 };
 
 // Officer - View Assigned Complaints
-export const getOfficerGrievances = async (officerName) => {
+export const getOfficerGrievances = async (officerId) => {
   const response = await grievanceApi.get(
-    `/grievances/officer/${officerName}`
+    `/grievances/officer/${officerId}`
   );
   return response.data;
 };

@@ -32,8 +32,7 @@ function AssignOfficerDialog({
 
     const [officers, setOfficers] = useState([]);
 
-    const [assignedOfficer, setAssignedOfficer] = useState("");
-
+const [assignedOfficer, setAssignedOfficer] = useState("");
     const [priority, setPriority] = useState("MEDIUM");
 
     const [status, setStatus] = useState("IN_PROGRESS");
@@ -42,11 +41,11 @@ function AssignOfficerDialog({
 
         if (grievance) {
 
-            loadOfficers(grievance.category);
+    loadOfficers(grievance.department);
 
-            setAssignedOfficer(
-                grievance.assignedOfficer || ""
-            );
+    setAssignedOfficer(
+        grievance.assignedOfficer || ""
+    );
 
             setPriority(
                 grievance.priority || "MEDIUM"
@@ -62,48 +61,68 @@ function AssignOfficerDialog({
 
     const loadOfficers = async (department) => {
 
-        try {
+    if (!department) {
+        setOfficers([]);
+        return;
+    }
 
-            const data =
-                await getOfficersByDepartment(department);
+    try {
 
-            setOfficers(data);
+        const data = await getOfficersByDepartment(
+            encodeURIComponent(department)
+        );
 
-        } catch (error) {
+        setOfficers(data || []);
 
-            console.error(error);
+    } catch (error) {
 
-        }
+        console.error("Failed to load officers:", error);
+        setOfficers([]);
 
-    };
+    }
+};
 
     const handleAssign = async () => {
 
-        try {
+    try {
 
-            await assignOfficer(grievance.id, {
+        const selectedOfficer = officers.find(
+            (officer) => String(officer.id) === String(assignedOfficer)
+        );
 
-                assignedOfficer,
-
-                priority,
-
-                status
-
-            });
-
-            alert("Officer Assigned Successfully");
-
-            onClose();
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert("Assignment Failed");
-
+        if (!selectedOfficer) {
+            alert("Please select an officer");
+            return;
         }
 
-    };
+        await assignOfficer(grievance.id, {
+
+            officerId: selectedOfficer.id,
+
+            assignedOfficer: selectedOfficer.fullName,
+
+            priority,
+
+            status
+
+        });
+
+        alert("Officer Assigned Successfully");
+
+        onClose();
+
+    } catch (error) {
+
+        console.error("Assignment failed:", error);
+
+        alert(
+            error.response?.data?.message ||
+            "Assignment Failed"
+        );
+
+    }
+
+};
 
     if (!grievance) return null;
 
@@ -151,9 +170,9 @@ function AssignOfficerDialog({
                         </Typography>
 
                         <Chip
-                            color="primary"
-                            label={grievance.category}
-                        />
+    color="primary"
+    label={grievance.department || "Department not assigned"}
+/>
 
                     </Grid>
 
@@ -162,32 +181,24 @@ function AssignOfficerDialog({
                 <Divider sx={{ my: 3 }} />
 
                 <TextField
-                    select
-                    fullWidth
-                    label="Select Officer"
-                    value={assignedOfficer}
-                    onChange={(e) =>
-                        setAssignedOfficer(
-                            e.target.value
-                        )
-                    }
-                    sx={{ mb: 3 }}
-                >
-
-                    {officers.map((officer) => (
-
-                        <MenuItem
-                            key={officer.id}
-                            value={officer.fullName}
-                        >
-
-                            {officer.fullName}
-
-                        </MenuItem>
-
-                    ))}
-
-                </TextField>
+    select
+    fullWidth
+    label="Select Officer"
+    value={assignedOfficer}
+    onChange={(e) => setAssignedOfficer(e.target.value)}
+    sx={{ mb: 3 }}
+>
+    {officers.map((officer) => (
+        <MenuItem
+            key={officer.id}
+            value={officer.id}
+        >
+            {officer.fullName}
+            {" — "}
+            {officer.designation}
+        </MenuItem>
+    ))}
+</TextField>
 
                 <TextField
                     select

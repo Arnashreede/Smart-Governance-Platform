@@ -52,7 +52,7 @@ if (inputStream != null) {
         gov.setAlignment(Element.ALIGN_CENTER);
         document.add(gov);
 
-        Paragraph civic = new Paragraph("CivicPulse Nexus", heading);
+        Paragraph civic = new Paragraph("Smart Goverance Platform for Administrative Operations with Citizen Assistance Group2", heading);
         civic.setAlignment(Element.ALIGN_CENTER);
         document.add(civic);
 
@@ -172,7 +172,7 @@ document.add(url);
         signature.setAlignment(Element.ALIGN_RIGHT);
         signature.add(new Chunk("Authorized Officer\n", bold));
         signature.add(new Chunk("Revenue Department\n", body));
-        signature.add(new Chunk("CivicPulse Nexus", body));
+        signature.add(new Chunk("Smart Goverance Platform for Administrative Operations with Citizen Assistance Group2", body));
 
         document.add(signature);
 

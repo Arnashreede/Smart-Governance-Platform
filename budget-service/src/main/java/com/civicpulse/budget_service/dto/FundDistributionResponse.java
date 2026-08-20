@@ -22,4 +22,7 @@ private String beneficiaryName;
 private BigDecimal amount;
 
 private Long budgetId;
+private String paymentMode;
+
+private String remarks;
 }

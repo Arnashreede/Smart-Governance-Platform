@@ -52,17 +52,20 @@ function OfficerRegistration() {
         }
 
         try {
+const selectedDepartment = departments.find(
+    d => d.id === Number(officer.departmentId)
+);
 
-            const response = await registerOfficer({
-                fullName: officer.fullName,
-                email: officer.email,
-                phone: officer.phone,
-                designation: officer.designation,
-                departmentId: Number(officer.departmentId),
-                role: "OFFICER",
-                password: officer.password
-            });
-
+const response = await registerOfficer({
+    fullName: officer.fullName,
+    email: officer.email,
+    phone: officer.phone,
+    designation: officer.designation,
+    department: selectedDepartment?.name,
+    departmentId: selectedDepartment?.id,
+    role: "OFFICER",
+    password: officer.password
+});
             alert(
                 "Officer Registered Successfully!\n\nOfficer ID : "
                 + (response.officerId || response.id)

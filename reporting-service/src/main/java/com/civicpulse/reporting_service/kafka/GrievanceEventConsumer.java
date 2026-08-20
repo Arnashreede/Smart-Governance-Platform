@@ -16,10 +16,10 @@ public class GrievanceEventConsumer {
     }
 
     @KafkaListener(
-            topics = "grievance-events",
-            groupId = "reporting-group",
-            containerFactory = "grievanceKafkaListenerContainerFactory"
-    )
+        topics = "grievance-created",
+        groupId = "reporting-group",
+        containerFactory = "grievanceKafkaListenerContainerFactory"
+)
     public void consumeGrievance(GrievanceCreatedEvent event) {
 
         GrievanceReport report = new GrievanceReport();
@@ -30,7 +30,7 @@ public class GrievanceEventConsumer {
         report.setCategory(event.getCategory());
         report.setStatus(event.getStatus());
         report.setPriority(event.getPriority());
-
+report.setEscalated(false);
         repository.save(report);
 
         System.out.println("Grievance saved in Reporting DB: "

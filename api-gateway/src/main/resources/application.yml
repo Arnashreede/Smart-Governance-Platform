@@ -52,7 +52,7 @@ spring:
         - id: welfare-service
           uri: lb://WELFARE-SERVICE
           predicates:
-            - Path=/welfare/**,/applications/**,/schemes/**
+            - Path=/welfare/**,/applications/**,/schemes/**,/documents/**,/beneficiaries/**
 
         - id: reporting-service
           uri: lb://REPORTING-SERVICE
@@ -67,18 +67,35 @@ spring:
           uri: lb://BUDGET-SERVICE
           predicates:
             - Path=/budgets/**
+        - id: audit-service
+          uri: lb://AUDIT-SERVICE
+          predicates:
+            - Path=/audit/**
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notifications/**
+        - id: service-management-service
+          uri: http://service-management-service:8088
+          predicates:
+           - Path=/services/**
+        - id: ai-analysis-service
+          uri: http://ai-analysis-service:8094
+          predicates:
+            - Path=/ai/**
 server:
   port: 8080
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
-
+      defaultZone: http://eureka-server:8761/eureka/
+      register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 5
   instance:
-    prefer-ip-address: true
-    ip-address: 127.0.0.1
-    hostname: localhost
+    prefer-ip-address: false
+    hostname: api-gateway
     instance-id: ${spring.application.name}:${server.port}
 
 management:

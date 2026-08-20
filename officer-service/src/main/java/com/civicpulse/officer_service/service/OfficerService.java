@@ -2,10 +2,12 @@ package com.civicpulse.officer_service.service;
 
 import com.civicpulse.officer_service.dto.RegisterRequest;
 import com.civicpulse.officer_service.entity.Officer;
+import com.civicpulse.officer_service.enums.OfficerStatus;
 import com.civicpulse.officer_service.repository.OfficerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Year;
 import java.util.List;
 
 @Service
@@ -20,10 +22,11 @@ public class OfficerService {
         this.restTemplate = restTemplate;
     }
 
-    // Generate Officer ID
-    private String generateOfficerId() {
+    // Generate Employee ID
+    private String generateEmployeeId() {
         long count = repository.count() + 1;
-        return "OFF" + String.format("%04d", count);
+        return "EMP-" + Year.now().getValue() + "-"
+                + String.format("%05d", count);
     }
 
     // Register Officer
@@ -37,18 +40,23 @@ public class OfficerService {
             throw new RuntimeException("Phone already exists");
         }
 
-        officer.setOfficerId(generateOfficerId());
+        officer.setEmployeeId(generateEmployeeId());
+        officer.setStatus(OfficerStatus.PENDING);
         officer.setActive(true);
 
-        // Save Officer
         Officer savedOfficer = repository.save(officer);
 
-        // Create Login Account in User Service
         RegisterRequest request = new RegisterRequest();
-        request.setFullName(savedOfficer.getFullName());
-        request.setEmail(savedOfficer.getEmail());
-        request.setPassword(savedOfficer.getPassword());
-        request.setRole("OFFICER");
+
+request.setFullName(savedOfficer.getFullName());
+request.setEmail(savedOfficer.getEmail());
+request.setPhone(savedOfficer.getPhone());
+request.setDesignation(savedOfficer.getDesignation());
+request.setPassword(savedOfficer.getPassword());
+request.setRole("OFFICER");
+request.setDepartmentId(savedOfficer.getDepartmentId());
+
+
 
         restTemplate.postForObject(
                 "http://localhost:8083/auth/register",
@@ -71,9 +79,9 @@ public class OfficerService {
                         new RuntimeException("Officer not found"));
     }
 
-    // Get Officer By Officer ID
-    public Officer getOfficerByOfficerId(String officerId) {
-        return repository.findByOfficerId(officerId)
+    // Get Officer By Employee ID
+    public Officer getOfficerByEmployeeId(String employeeId) {
+        return repository.findByEmployeeId(employeeId)
                 .orElseThrow(() ->
                         new RuntimeException("Officer not found"));
     }
@@ -88,12 +96,12 @@ public class OfficerService {
         return repository.count();
     }
 
-    // Get Officers By Department
+    // Officers By Department
     public List<Officer> getOfficersByDepartment(String department) {
         return repository.findByDepartment(department);
     }
 
-    // Get Officers By Department & Designation
+    // Officers By Department & Designation
     public List<Officer> getOfficersByDepartmentAndDesignation(
             String department,
             String designation) {
@@ -104,7 +112,7 @@ public class OfficerService {
         );
     }
 
-    // Count Officers In Department
+    // Count Officers
     public long getDepartmentOfficerCount(String department) {
         return repository.countByDepartment(department);
     }
@@ -120,16 +128,45 @@ public class OfficerService {
         officer.setEmail(updatedOfficer.getEmail());
         officer.setPhone(updatedOfficer.getPhone());
         officer.setDepartment(updatedOfficer.getDepartment());
+        officer.setDepartmentId(updatedOfficer.getDepartmentId());
         officer.setDesignation(updatedOfficer.getDesignation());
 
-        // Update password if provided
-        if (updatedOfficer.getPassword() != null &&
-                !updatedOfficer.getPassword().isBlank()) {
+        if (updatedOfficer.getPassword() != null
+                && !updatedOfficer.getPassword().isBlank()) {
+
             officer.setPassword(updatedOfficer.getPassword());
         }
 
+        officer.setStatus(updatedOfficer.getStatus());
         officer.setActive(updatedOfficer.isActive());
 
         return repository.save(officer);
     }
+    // Get Officers By Status
+public List<Officer> getOfficersByStatus(OfficerStatus status) {
+    return repository.findByStatus(status);
+}
+// Approve Officer
+public Officer approveOfficer(Long id) {
+
+    Officer officer = repository.findById(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Officer not found"));
+
+    officer.setStatus(OfficerStatus.ACTIVE);
+
+    return repository.save(officer);
+}
+
+// Reject Officer
+public Officer rejectOfficer(Long id) {
+
+    Officer officer = repository.findById(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Officer not found"));
+
+    officer.setStatus(OfficerStatus.REJECTED);
+
+    return repository.save(officer);
+}
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { adminLogin } from "../services/adminAuthService";
+import { citizenLogin } from "../services/citizenAuthService";
+import api from "../api/axios";
 
 function CitizenLogin() {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ function CitizenLogin() {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setLogin({
       ...login,
@@ -18,30 +21,178 @@ function CitizenLogin() {
   };
 
   const handleLogin = async () => {
-    try {
-      const data = await adminLogin(
-        login.email,
-        login.password
-      );
+    if (!login.email || !login.password) {
+      alert("Please enter email and password.");
+      return;
+    }
 
-      console.log("========== LOGIN RESPONSE ==========");
+    try {
+      setLoading(true);
+
+      // ==============================
+      // LOGIN
+      // ==============================
+
+      const data = await citizenLogin(
+    login.email,
+    login.password
+);
+
+      console.log(
+        "========== LOGIN RESPONSE =========="
+      );
       console.log(data);
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("userId", data.id);
-      localStorage.setItem("citizenId", data.id);
-      localStorage.setItem("email", data.email);
-      localStorage.setItem("fullName", data.fullName);
+      // ==============================
+      // STORE LOGIN INFORMATION
+      // ==============================
+
+      localStorage.setItem(
+        "token",
+        data.token
+      );
+
+      localStorage.setItem(
+        "role",
+        data.role
+      );
+
+      // This is the USER-SERVICE ID.
+      // Do NOT use this as citizenId.
+      localStorage.setItem(
+        "userId",
+        data.id
+      );
+
+      localStorage.setItem(
+        "email",
+        data.email || login.email
+      );
+
+      localStorage.setItem(
+        "fullName",
+        data.fullName || ""
+      );
+
+      // ==============================
+      // CITIZEN LOGIN
+      // ==============================
 
       if (data.role === "CITIZEN") {
-        navigate("/citizen-dashboard");
+        try {
+          console.log(
+            "Loading citizens to find actual citizen record..."
+          );
+
+          const response = await api.get(
+            "/citizens"
+          );
+
+          const citizens =
+            response.data || [];
+
+          console.log(
+            "CITIZENS FROM DATABASE:",
+            citizens
+          );
+
+          // Find citizen using email
+          const citizen =
+            citizens.find(
+              (item) =>
+                String(item.email)
+                  .toLowerCase()
+                  .trim() ===
+                String(
+                  data.email || login.email
+                )
+                  .toLowerCase()
+                  .trim()
+            );
+
+          if (!citizen) {
+            console.error(
+              "Citizen record not found for email:",
+              data.email || login.email
+            );
+
+            alert(
+              "Login successful, but your citizen profile could not be found."
+            );
+
+            return;
+          }
+
+          console.log(
+            "========== ACTUAL CITIZEN =========="
+          );
+          console.log(citizen);
+
+          // ==============================
+          // IMPORTANT
+          // ==============================
+
+          // This is the REAL citizen-service ID.
+          localStorage.setItem(
+            "citizenId",
+            citizen.id
+          );
+
+          // Use the citizen database name
+          // if available.
+          if (citizen.fullName) {
+            localStorage.setItem(
+              "fullName",
+              citizen.fullName
+            );
+          }
+
+          console.log(
+            "USER ID:",
+            data.id
+          );
+
+          console.log(
+            "CITIZEN ID:",
+            citizen.id
+          );
+
+          console.log(
+            "CITIZEN NAME:",
+            citizen.fullName
+          );
+
+          navigate(
+            "/citizen-dashboard"
+          );
+        } catch (citizenError) {
+          console.error(
+            "Failed to load citizen records:",
+            citizenError
+          );
+
+          alert(
+            citizenError.response?.data?.message ||
+              "Login successful, but citizen profile could not be loaded."
+          );
+        }
       } else {
-        alert("Please login through the Citizen Portal.");
+        alert(
+          "Please login through the Citizen Portal."
+        );
       }
     } catch (error) {
-      console.error("Login Error:", error);
-      alert("Invalid Email or Password");
+      console.error(
+        "Login Error:",
+        error
+      );
+
+      alert(
+        error.response?.data?.message ||
+          "Invalid Email or Password"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,11 +201,14 @@ function CitizenLogin() {
       <div style={leftPanel}>
         <h1>👤 Citizen Portal</h1>
 
-        <h2>CivicPulse Nexus</h2>
+        <h2>
+          Smart Goverance Platform
+        </h2>
 
         <p>
-          Register complaints, track complaint status,
-          and stay updated on issue resolution.
+          Register complaints, track complaint
+          status, and stay updated on issue
+          resolution.
         </p>
       </div>
 
@@ -69,6 +223,7 @@ function CitizenLogin() {
             value={login.email}
             onChange={handleChange}
             style={input}
+            disabled={loading}
           />
 
           <input
@@ -78,16 +233,28 @@ function CitizenLogin() {
             value={login.password}
             onChange={handleChange}
             style={input}
+            disabled={loading}
           />
 
           <button
-            style={button}
+            style={{
+              ...button,
+              opacity: loading ? 0.7 : 1,
+            }}
             onClick={handleLogin}
+            disabled={loading}
           >
-            Login
+            {loading
+              ? "Logging in..."
+              : "Login"}
           </button>
 
-          <p style={{ textAlign: "center", marginTop: "20px" }}>
+          <p
+            style={{
+              textAlign: "center",
+              marginTop: "20px",
+            }}
+          >
             New Citizen?{" "}
             <Link to="/citizen/register">
               Register Here
@@ -113,7 +280,8 @@ const page = {
 
 const leftPanel = {
   flex: 1,
-  background: "linear-gradient(135deg,#2E7D32,#66BB6A)",
+  background:
+    "linear-gradient(135deg,#2E7D32,#66BB6A)",
   color: "white",
   display: "flex",
   flexDirection: "column",
@@ -134,7 +302,8 @@ const card = {
   background: "white",
   padding: "40px",
   borderRadius: "15px",
-  boxShadow: "0 10px 25px rgba(0,0,0,.15)",
+  boxShadow:
+    "0 10px 25px rgba(0,0,0,.15)",
 };
 
 const input = {
@@ -143,6 +312,7 @@ const input = {
   marginTop: "15px",
   borderRadius: "8px",
   border: "1px solid #ccc",
+  boxSizing: "border-box",
 };
 
 const button = {

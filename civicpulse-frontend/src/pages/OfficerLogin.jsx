@@ -31,10 +31,25 @@ function OfficerLogin() {
 
       // Save Login Details
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("userId", data.id);
-      localStorage.setItem("email", data.email);
-      localStorage.setItem("fullName", data.fullName);
+localStorage.setItem("role", data.role);
+localStorage.setItem("userId", data.id);
+localStorage.setItem("email", data.email);
+localStorage.setItem("fullName", data.fullName);
+
+localStorage.setItem(
+  "employeeId",
+  data.employeeId || data.id
+);
+
+localStorage.setItem(
+  "departmentId",
+  data.departmentId || ""
+);
+
+localStorage.setItem(
+  "departmentName",
+  data.departmentName || ""
+);
 
       if (data.role === "OFFICER") {
         navigate("/officer-dashboard");
@@ -64,7 +79,7 @@ function OfficerLogin() {
 
         <h1>👮 Officer Portal</h1>
 
-        <h2>CivicPulse Nexus</h2>
+        <h2>Smart Goverance Platform</h2>
 
         <p>
           View assigned complaints, update complaint status,

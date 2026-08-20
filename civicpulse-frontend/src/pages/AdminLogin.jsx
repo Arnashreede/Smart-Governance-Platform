@@ -46,7 +46,7 @@ localStorage.setItem("userId", data.id);
     <div style={page}>
 
       <div style={leftPanel}>
-        <h1>🏛 CivicPulse Nexus</h1>
+        <h1>🏛 Smart Goverance Platform</h1>
         <h2>Government Administration Portal</h2>
 
         <p>

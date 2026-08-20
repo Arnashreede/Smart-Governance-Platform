@@ -55,7 +55,7 @@ public class ReportServiceImpl implements ReportService {
                 .pendingApplications(
                         applicationRepository.countByWelfareSchemeIdAndStatus(
                                 scheme.getId(),
-                                ApplicationStatus.PENDING))
+                                ApplicationStatus.SUBMITTED))
 
                 .rejectedApplications(
                         applicationRepository.countByWelfareSchemeIdAndStatus(

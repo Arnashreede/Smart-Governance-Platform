@@ -5,6 +5,8 @@ import com.civicpulse.welfare_service.dto.WelfareApplicationResponse;
 import com.civicpulse.welfare_service.service.WelfareApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -15,12 +17,6 @@ public class WelfareApplicationController {
 
     private final WelfareApplicationService welfareApplicationService;
 
-    @PostMapping
-    public WelfareApplicationResponse applyForScheme(
-            @RequestBody WelfareApplicationRequest request) {
-
-        return welfareApplicationService.applyForScheme(request);
-    }
 
     @GetMapping
     public List<WelfareApplicationResponse> getAllApplications() {
@@ -43,9 +39,31 @@ public class WelfareApplicationController {
     }
 
     @PutMapping("/{applicationId}/reject")
-    public WelfareApplicationResponse rejectApplication(
-            @PathVariable Long applicationId) {
+public WelfareApplicationResponse rejectApplication(
+        @PathVariable Long applicationId,
+        @RequestParam String reason) {
 
-        return welfareApplicationService.rejectApplication(applicationId);
-    }
+    return welfareApplicationService.rejectApplication(applicationId, reason);
+}
+@GetMapping("/{applicationId}")
+public WelfareApplicationResponse getApplicationById(
+        @PathVariable Long applicationId) {
+
+    return welfareApplicationService.getApplicationById(applicationId);
+}
+@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public WelfareApplicationResponse applyScheme(
+        @RequestPart("application") WelfareApplicationRequest request,
+        @RequestPart(value = "documents", required = false) List<MultipartFile> documents) {
+
+    return welfareApplicationService.applyForScheme(request, documents);
+}
+@GetMapping("/department/{department}")
+public List<WelfareApplicationResponse> getApplicationsByDepartment(
+        @PathVariable String department) {
+
+    return welfareApplicationService
+            .getApplicationsByDepartment(department);
+}
+
 }

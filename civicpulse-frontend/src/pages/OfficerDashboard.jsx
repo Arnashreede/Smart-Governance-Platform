@@ -15,7 +15,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import DescriptionIcon from "@mui/icons-material/Description";
 
 import { useNavigate } from "react-router-dom";
-
+import DashboardCard from "../components/DashboardCard";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
@@ -26,7 +26,7 @@ function OfficerDashboard() {
   const fullName = localStorage.getItem("fullName") || "Officer";
   const email = localStorage.getItem("email") || "";
   const role = localStorage.getItem("role") || "";
-  const officerId = localStorage.getItem("userId") || "";
+  const employeeId = localStorage.getItem("employeeId") || "";
 
   return (
     <>
@@ -69,17 +69,21 @@ function OfficerDashboard() {
                 Welcome, {fullName}
               </Typography>
 
-              <Typography>
-                Officer ID : {officerId}
-              </Typography>
+              <Typography sx={{ mt: 1 }}>
+  Employee ID: {employeeId}
+</Typography>
 
-              <Typography>
-                {email}
-              </Typography>
+<Typography>
+  {email}
+</Typography>
 
-              <Typography>
-                {role}
-              </Typography>
+<Typography>
+  Role: {role}
+</Typography>
+
+<Typography sx={{ mt: 2, opacity: 0.9 }}>
+  Manage grievances, applications, welfare schemes and citizen services from one dashboard.
+</Typography>
 
             </Box>
 
@@ -87,8 +91,9 @@ function OfficerDashboard() {
               sx={{
                 width: 90,
                 height: 90,
-                bgcolor: "white",
-                color: "#1565C0",
+                background: "linear-gradient(135deg,#FF9800,#F57C00)",
+color: "white",
+fontWeight: "bold",
                 fontSize: 35,
               }}
             >
@@ -154,7 +159,8 @@ function OfficerDashboard() {
       title="Pending Applications"
       description="Review, verify and approve citizen applications."
       buttonText="View Applications"
-      onClick={() => navigate("/applications")}
+      onClick={() => navigate("/officer/applications")}
+
     />
   </Grid>
 
@@ -164,19 +170,54 @@ function OfficerDashboard() {
       title="Assigned Complaints"
       description="Resolve complaints assigned to you."
       buttonText="Open Complaints"
-      onClick={() => navigate("/assigned-grievances")}
+      onClick={() => navigate("/grievances")}
     />
+  </Grid>
+<Grid item xs={12} md={4}>
+  <ActionCard
+    icon="🎯"
+    title="Welfare Applications"
+    description="Verify welfare applications"
+    buttonText="Open"
+    onClick={() => navigate("/officer/welfare")}
+/>
+</Grid>
+<ActionCard
+    icon="💰"
+    title="Issue Benefits"
+    description="Release benefits to approved beneficiaries."
+    buttonText="Issue Benefits"
+    onClick={() => navigate("/officer/beneficiaries")}
+/>
+<Grid item xs={12} md={4}>
+<ActionCard
+    icon="👤"
+    title="My Profile"
+    description="View officer profile"
+    buttonText="Open"
+    onClick={() => navigate("/officer/profile")}
+/>
   </Grid>
 
   <Grid item xs={12} md={4}>
-    <ActionCard
-      icon="🏅"
-      title="Issue Certificates"
-      description="Generate certificates for approved applications."
-      buttonText="Issue Certificate"
-      onClick={() => navigate("/certificates")}
-    />
-  </Grid>
+  <ActionCard
+    icon="💰"
+    title="Budget Management"
+    description="Manage budgets, fund distribution and financial reports."
+    buttonText="Open"
+    onClick={() => navigate("/budget-dashboard")}
+  />
+</Grid>
+
+  <Grid item xs={12} md={4}>
+  <ActionCard
+    icon="📊"
+    title="Reports"
+    description="View work reports and statistics."
+    buttonText="Open"
+    onClick={() => navigate("/reports")}
+  />
+</Grid>
 
 </Grid>
 
@@ -185,42 +226,7 @@ function OfficerDashboard() {
   );
 }
 
-function DashboardCard({ title, value, icon }) {
 
-  return (
-    <Card
-      sx={{
-        borderRadius: 4,
-        boxShadow: 3,
-      }}
-    >
-      <CardContent
-        sx={{ textAlign: "center" }}
-      >
-        <Box
-          sx={{
-            color: "#1565C0",
-            fontSize: 45,
-          }}
-        >
-          {icon}
-        </Box>
-
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-        >
-          {value}
-        </Typography>
-
-        <Typography color="text.secondary">
-          {title}
-        </Typography>
-
-      </CardContent>
-    </Card>
-  );
-}
 
 function ActionCard({
   icon,

@@ -11,12 +11,22 @@ public interface WelfareApplicationRepository
 
     List<WelfareApplication> findByCitizenId(Long citizenId);
 
-    boolean existsByCitizenIdAndWelfareSchemeId(Long citizenId,
-                                                Long welfareSchemeId);
+    boolean existsByCitizenIdAndWelfareSchemeId(
+            Long citizenId,
+            Long welfareSchemeId
+    );
 
     long countByStatus(ApplicationStatus status);
-long countByWelfareSchemeId(Long schemeId);
 
-long countByWelfareSchemeIdAndStatus(Long schemeId,
-                                     ApplicationStatus status);
+    long countByWelfareSchemeId(Long schemeId);
+
+    long countByWelfareSchemeIdAndStatus(
+            Long schemeId,
+            ApplicationStatus status
+    );
+
+    List<WelfareApplication> findByStatus(ApplicationStatus status);
+
+    // Department-wise applications
+    List<WelfareApplication> findByDepartment(String department);
 }

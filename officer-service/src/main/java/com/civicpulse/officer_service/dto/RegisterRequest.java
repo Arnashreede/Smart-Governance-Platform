@@ -6,7 +6,9 @@ public class RegisterRequest {
     private String email;
     private String password;
     private String role;
-
+private String phone;
+private String designation;
+private Long departmentId;
     public String getFullName() {
         return fullName;
     }
@@ -38,4 +40,27 @@ public class RegisterRequest {
     public void setRole(String role) {
         this.role = role;
     }
+    public String getPhone() {
+    return phone;
+}
+
+public void setPhone(String phone) {
+    this.phone = phone;
+}
+
+public String getDesignation() {
+    return designation;
+}
+
+public void setDesignation(String designation) {
+    this.designation = designation;
+}
+
+public Long getDepartmentId() {
+    return departmentId;
+}
+
+public void setDepartmentId(Long departmentId) {
+    this.departmentId = departmentId;
+}
 }

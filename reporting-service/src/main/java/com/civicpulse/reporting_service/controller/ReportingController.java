@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import com.civicpulse.reporting_service.dto.DashboardResponse;
-
+import com.civicpulse.reporting_service.dto.CitizenDashboardResponse;
 @RestController
 @RequestMapping("/reports")
 public class ReportingController {
@@ -22,7 +22,11 @@ public class ReportingController {
     public List<CitizenReport> getCitizens() {
         return reportingService.getAllCitizens();
     }
-
+@GetMapping("/dashboard/citizen/{citizenId}")
+public CitizenDashboardResponse getCitizenDashboard(
+        @PathVariable Long citizenId) {
+    return reportingService.getCitizenDashboard(citizenId);
+}
     @GetMapping("/grievances")
     public List<GrievanceReport> getGrievances() {
         return reportingService.getAllGrievances();

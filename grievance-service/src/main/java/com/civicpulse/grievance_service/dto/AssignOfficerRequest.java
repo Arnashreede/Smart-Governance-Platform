@@ -1,12 +1,28 @@
 package com.civicpulse.grievance_service.dto;
 
+import java.time.LocalDate;
+
 public class AssignOfficerRequest {
 
+    private Long officerId;
+
     private String assignedOfficer;
+
     private String priority;
-    private String status;
+
+    private LocalDate deadline;
+
+    private String remarks;
 
     public AssignOfficerRequest() {
+    }
+
+    public Long getOfficerId() {
+        return officerId;
+    }
+
+    public void setOfficerId(Long officerId) {
+        this.officerId = officerId;
     }
 
     public String getAssignedOfficer() {
@@ -25,11 +41,19 @@ public class AssignOfficerRequest {
         this.priority = priority;
     }
 
-    public String getStatus() {
-        return status;
+    public LocalDate getDeadline() {
+        return deadline;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setDeadline(LocalDate deadline) {
+        this.deadline = deadline;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

@@ -1,5 +1,6 @@
 package com.civicpulse.officer_service.entity;
 
+import com.civicpulse.officer_service.enums.OfficerStatus;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,44 +11,62 @@ public class Officer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String officerId;
+    @Column(unique = true, nullable = false)
+    private String employeeId;
 
+    @Column(nullable = false)
     private String fullName;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String phone;
 
+    @Column(nullable = false)
     private String department;
 
+    @Column(nullable = false)
     private String designation;
 
+    @Column(nullable = false)
     private String password;
 
-    private boolean active = true;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OfficerStatus status = OfficerStatus.PENDING;
 
+    @Column(nullable = false)
+    private boolean active = true;
+@Column(nullable = false)
+private Long departmentId;
     public Officer() {
     }
 
     public Officer(Long id,
-                   String officerId,
-                   String fullName,
-                   String email,
-                   String phone,
-                   String department,
-                   String designation) {
+               String employeeId,
+               String fullName,
+               String email,
+               String phone,
+               String department,
+               Long departmentId,
+               String designation,
+               String password,
+               OfficerStatus status,
+               boolean active) {
 
-        this.id = id;
-        this.officerId = officerId;
-        this.fullName = fullName;
-        this.email = email;
-        this.phone = phone;
-        this.department = department;
-        this.designation = designation;
-    }
+    this.id = id;
+    this.employeeId = employeeId;
+    this.fullName = fullName;
+    this.email = email;
+    this.phone = phone;
+    this.department = department;
+    this.departmentId = departmentId;
+    this.designation = designation;
+    this.password = password;
+    this.status = status;
+    this.active = active;
+}
 
     public Long getId() {
         return id;
@@ -57,12 +76,12 @@ public class Officer {
         this.id = id;
     }
 
-    public String getOfficerId() {
-        return officerId;
+    public String getEmployeeId() {
+        return employeeId;
     }
 
-    public void setOfficerId(String officerId) {
-        this.officerId = officerId;
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
     }
 
     public String getFullName() {
@@ -113,6 +132,14 @@ public class Officer {
         this.password = password;
     }
 
+    public OfficerStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfficerStatus status) {
+        this.status = status;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -120,4 +147,11 @@ public class Officer {
     public void setActive(boolean active) {
         this.active = active;
     }
+    public Long getDepartmentId() {
+    return departmentId;
+}
+
+public void setDepartmentId(Long departmentId) {
+    this.departmentId = departmentId;
+}
 }

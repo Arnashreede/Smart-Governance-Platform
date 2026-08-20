@@ -1,0 +1,10 @@
+﻿.env
+*.jar
+*.zip
+*.log
+hs_err_pid*.log
+replay_pid*.log
+BOOT-INF/
+node_modules/
+dist/
+target/

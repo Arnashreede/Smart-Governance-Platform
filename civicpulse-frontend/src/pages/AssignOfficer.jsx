@@ -35,7 +35,7 @@ function AssignOfficer() {
   const loadGrievances = async () => {
     try {
       const data = await getAllGrievances();
-
+console.log("ALL GRIEVANCES:", data);
       setGrievances(data);
       setFiltered(data);
     } catch (error) {

@@ -40,18 +40,20 @@ function DepartmentDetails() {
 
   const loadOfficers = async () => {
     try {
-      const departmentName = decodeURIComponent(department).replace(
-  " Department",
-  ""
-);
+        const departmentName = decodeURIComponent(department);
 
-const data = await getOfficersByDepartment(departmentName);
+        console.log("Department:", departmentName);
 
-      setOfficers(data);
+        const data = await getOfficersByDepartment(departmentName);
+
+        console.log("Officers:", data);
+
+        setOfficers(data);
     } catch (err) {
-      console.error(err);
+        console.error("Failed to load officers:", err);
+        setOfficers([]);
     }
-  };
+};
 
   const updateDesignation = async (officer, designation) => {
     try {

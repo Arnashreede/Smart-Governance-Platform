@@ -34,10 +34,12 @@ public class GrievanceController {
         return grievanceService.getDashboardCounts();
     }
 
-    @GetMapping("/officer/{name}")
-    public List<Grievance> getOfficerGrievances(@PathVariable String name) {
-        return grievanceService.getOfficerGrievances(name);
-    }
+   @GetMapping("/officer/{officerId}")
+public List<Grievance> getOfficerGrievances(
+        @PathVariable Long officerId) {
+
+    return grievanceService.getOfficerGrievances(officerId);
+}
 
     @GetMapping("/citizen/{citizenId}")
     public List<Grievance> getCitizenGrievances(@PathVariable Long citizenId) {

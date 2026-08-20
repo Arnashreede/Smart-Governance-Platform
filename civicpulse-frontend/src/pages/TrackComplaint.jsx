@@ -35,9 +35,9 @@ function TrackComplaint() {
     const loadComplaints = async () => {
         try {
 
-            const citizenId = localStorage.getItem("citizenId");
+           const citizenId = localStorage.getItem("userId");
 
-            const data = await getCitizenGrievances(citizenId);
+const data = await getCitizenGrievances(citizenId);
 
             setComplaints(data);
 

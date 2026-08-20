@@ -1,7 +1,9 @@
 package com.civicpulse.welfare_service.controller;
 
+import com.civicpulse.welfare_service.dto.WelfareApplicationResponse;
 import com.civicpulse.welfare_service.dto.WelfareRequest;
 import com.civicpulse.welfare_service.dto.WelfareResponse;
+import com.civicpulse.welfare_service.service.WelfareApplicationService;
 import com.civicpulse.welfare_service.service.WelfareSchemeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +16,7 @@ import java.util.List;
 public class WelfareSchemeController {
 
     private final WelfareSchemeService welfareSchemeService;
-
+private final WelfareApplicationService welfareApplicationService;
     @PostMapping
     public WelfareResponse createScheme(@RequestBody WelfareRequest request){
 
@@ -45,5 +47,13 @@ public class WelfareSchemeController {
 
         welfareSchemeService.deleteScheme(id);
     }
+@PutMapping("/{applicationId}/reject")
+public WelfareApplicationResponse rejectApplication(
+        @PathVariable Long applicationId,
+        @RequestParam String rejectionReason) {
 
+    return welfareApplicationService.rejectApplication(
+            applicationId,
+            rejectionReason);
+}
 }

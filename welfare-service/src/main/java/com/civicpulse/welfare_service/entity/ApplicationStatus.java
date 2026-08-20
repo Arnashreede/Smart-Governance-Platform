@@ -2,7 +2,8 @@ package com.civicpulse.welfare_service.entity;
 
 public enum ApplicationStatus {
 
-    PENDING,
+    SUBMITTED,
+    UNDER_REVIEW,
     APPROVED,
     REJECTED
 

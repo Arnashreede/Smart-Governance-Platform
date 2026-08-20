@@ -33,31 +33,30 @@ public class UserService {
     // Register User / Officer
     public User register(RegisterRequest request) {
 
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
-
-        User user = new User();
-
-        user.setFullName(request.getFullName());
-        user.setEmail(request.getEmail());
-        user.setPhone(request.getPhone());
-        user.setDesignation(request.getDesignation());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
-        user.setActive(true);
-
-        if (request.getDepartmentId() != null) {
-
-            Department department = departmentRepository.findById(request.getDepartmentId())
-                    .orElseThrow(() -> new RuntimeException("Department not found"));
-
-            user.setDepartment(department);
-        }
-
-        return userRepository.save(user);
+    if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        throw new RuntimeException("Email already exists");
     }
 
+    User user = new User();
+
+    user.setFullName(request.getFullName());
+    user.setEmail(request.getEmail());
+    user.setPhone(request.getPhone());
+    user.setDesignation(request.getDesignation());
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+    user.setRole(request.getRole());
+    user.setActive(true);
+
+    if (request.getDepartmentId() != null) {
+
+        Department department = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+
+        user.setDepartment(department);
+    }
+
+    return userRepository.save(user);
+}
     // Login User
     public LoginResponse login(LoginRequest request) {
 
@@ -78,12 +77,14 @@ public class UserService {
         );
 
         return new LoginResponse(
-                token,
-                user.getRole(),
-                user.getId(),
-                user.getEmail(),
-                user.getFullName()
-        );
+    token,
+    user.getRole(),
+    user.getId(),
+    user.getEmail(),
+    user.getFullName(),
+    user.getDepartment() != null ? user.getDepartment().getId() : null,
+    user.getDepartment() != null ? user.getDepartment().getName() : null
+);
     }
 
     public User findByEmail(String email) {

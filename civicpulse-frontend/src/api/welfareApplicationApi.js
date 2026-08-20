@@ -5,7 +5,7 @@ export const applyForScheme = (data) =>
 
 export const getApplications = () =>
     api.get("/applications");
-
+export const getAllApplications = getApplications;
 export const getCitizenApplications = (id) =>
     api.get(`/applications/citizen/${id}`);
 

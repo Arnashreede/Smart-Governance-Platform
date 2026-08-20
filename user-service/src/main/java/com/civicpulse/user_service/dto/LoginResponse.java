@@ -7,18 +7,24 @@ public class LoginResponse {
     private Long id;
     private String email;
     private String fullName;
+    private Long departmentId;
+    private String departmentName;
 
     public LoginResponse(String token,
                          String role,
                          Long id,
                          String email,
-                         String fullName) {
+                         String fullName,
+                         Long departmentId,
+                         String departmentName) {
 
         this.token = token;
         this.role = role;
         this.id = id;
         this.email = email;
         this.fullName = fullName;
+        this.departmentId = departmentId;
+        this.departmentName = departmentName;
     }
 
     public String getToken() {
@@ -59,5 +65,21 @@ public class LoginResponse {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import jakarta.validation.Valid;
-
+import com.civicpulse.citizen_service.dto.CitizenResponse;
 @RestController
 @RequestMapping("/citizens")
 
@@ -18,20 +18,51 @@ public class CitizenController {
     private CitizenService citizenService;
 
     @GetMapping
-public List<Citizen> getAllCitizens() {
+public List<CitizenResponse> getAllCitizens() {
     System.out.println("GET endpoint called");
-    return citizenService.getAllCitizens();
+
+    return citizenService.getAllCitizens()
+            .stream()
+            .map(citizen -> new CitizenResponse(
+                    citizen.getId(),
+                    citizen.getFullName(),
+                    citizen.getEmail(),
+                    citizen.getPhone(),
+                    citizen.getAddress(),
+                    citizen.getAadhaarNumber()
+            ))
+            .toList();
 }
 @PostMapping
-public Citizen addCitizen(@Valid @RequestBody Citizen citizen) {
-    System.out.println("POST endpoint called");
-    return citizenService.saveCitizen(citizen);
-}
+public CitizenResponse addCitizen(@Valid @RequestBody Citizen citizen) {
 
+    System.out.println("POST endpoint called");
+
+    Citizen savedCitizen = citizenService.saveCitizen(citizen);
+
+    return new CitizenResponse(
+            savedCitizen.getId(),
+            savedCitizen.getFullName(),
+            savedCitizen.getEmail(),
+            savedCitizen.getPhone(),
+            savedCitizen.getAddress(),
+            savedCitizen.getAadhaarNumber()
+    );
+}
     @GetMapping("/{id}")
-    public Citizen getCitizen(@PathVariable Long id) {
-        return citizenService.getCitizenById(id);
-    }
+public CitizenResponse getCitizen(@PathVariable Long id) {
+
+    Citizen citizen = citizenService.getCitizenById(id);
+
+    return new CitizenResponse(
+            citizen.getId(),
+            citizen.getFullName(),
+            citizen.getEmail(),
+            citizen.getPhone(),
+            citizen.getAddress(),
+            citizen.getAadhaarNumber()
+    );
+}
 
     @DeleteMapping("/{id}")
     public String deleteCitizen(@PathVariable Long id) {

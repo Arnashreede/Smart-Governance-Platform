@@ -27,7 +27,9 @@ private Long citizenId;
 private String beneficiaryName;
 
 private BigDecimal amount;
+private String paymentMode;
 
+private String remarks;
     @ManyToOne
     @JoinColumn(name = "budget_id")
     private Budget budget;

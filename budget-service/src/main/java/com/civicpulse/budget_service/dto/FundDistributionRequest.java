@@ -12,4 +12,7 @@ private String schemeName;
 private Long citizenId;
 private String beneficiaryName;
 private BigDecimal amount;
+private String paymentMode;
+
+private String remarks;
 }

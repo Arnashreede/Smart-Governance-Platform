@@ -41,3 +41,15 @@ export const updateOfficer = async (id, officer) => {
   );
   return response.data;
 };
+
+// Approve Officer
+export const approveOfficer = async (id) => {
+  const response = await officerApi.put(`/officers/${id}/approve`);
+  return response.data;
+};
+
+// Reject Officer
+export const rejectOfficer = async (id) => {
+  const response = await officerApi.put(`/officers/${id}/reject`);
+  return response.data;
+};

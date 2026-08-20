@@ -46,7 +46,7 @@ public class DashboardServiceImpl implements DashboardService {
 
                 .totalApplications(applicationRepository.count())
                 .approvedApplications(applicationRepository.countByStatus(ApplicationStatus.APPROVED))
-                .pendingApplications(applicationRepository.countByStatus(ApplicationStatus.PENDING))
+                .pendingApplications(applicationRepository.countByStatus(ApplicationStatus.SUBMITTED))
                 .rejectedApplications(applicationRepository.countByStatus(ApplicationStatus.REJECTED))
 
                 .totalBeneficiaries(beneficiaryRepository.count())

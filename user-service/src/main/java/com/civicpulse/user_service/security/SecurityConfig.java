@@ -34,6 +34,7 @@ public class SecurityConfig {
     // Public endpoints
     .requestMatchers(
             "/auth/**",
+            "/users",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html"
@@ -41,7 +42,7 @@ public class SecurityConfig {
 
     // Department APIs
     .requestMatchers(HttpMethod.GET, "/departments/**")
-    .authenticated()
+    .permitAll()
 
     .requestMatchers(HttpMethod.POST, "/departments/**")
     .hasRole("ADMIN")

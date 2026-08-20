@@ -22,4 +22,6 @@ public class GrievanceReport {
     private String status;
 
     private String priority;
+
+    private boolean escalated;
 }

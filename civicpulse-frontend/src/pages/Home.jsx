@@ -10,7 +10,7 @@ function Home() {
       {/* Hero Section */}
       <div style={hero}>
 
-        <h1 style={title}>🏛 CivicPulse Nexus</h1>
+        <h1 style={title}>🏛 Smart Goverance Platform</h1>
 
         <h2 style={subtitle}>
           Smart Governance & Citizen Services Platform
@@ -87,7 +87,7 @@ function Home() {
       {/* Footer */}
 
       <footer style={footer}>
-        © 2026 CivicPulse Nexus | Smart Governance Platform
+        © 2026 Smart Goverance Platform for Administrative Operations with Citizen Assistance Group2 | Smart Governance Platform
       </footer>
 
     </div>

@@ -76,9 +76,17 @@ function DepartmentManagement() {
     try {
 
       if (editing) {
-        await updateDepartment(department.id, department);
+        await updateDepartment(department.id, {
+    name: department.name,
+    description: department.description,
+    active: true
+});
       } else {
-        await createDepartment(department);
+        await createDepartment({
+    name: department.name,
+    description: department.description,
+    active: true
+});
       }
 
       setDepartment({
@@ -181,7 +189,7 @@ function DepartmentManagement() {
           <IconButton
             color="primary"
             onClick={() =>
-              navigate(`/departments/${params.row.id}`)
+              navigate(`/departments/${encodeURIComponent(params.row.name)}`)
             }
           >
             <VisibilityIcon />

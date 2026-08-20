@@ -129,9 +129,10 @@ public BudgetResponse allocateBudget(Long id, AllocationRequest request) {
 
     budget.setAllocatedAmount(newAllocated);
     budget.setRemainingAmount(
-            budget.getTotalBudget().subtract(newAllocated)
-    );
-
+    budget.getTotalBudget().subtract(
+        budget.getSpentAmount()
+    )
+);
     Budget updated = budgetRepository.save(budget);
 
     return BudgetResponse.builder()
@@ -159,8 +160,8 @@ public BudgetResponse addExpense(Long id, ExpenseRequest request) {
     budget.setSpentAmount(newSpent);
 
     budget.setRemainingAmount(
-            budget.getAllocatedAmount().subtract(newSpent)
-    );
+    budget.getTotalBudget().subtract(newSpent)
+);
 
     Budget updated = budgetRepository.save(budget);
 
@@ -186,13 +187,15 @@ public FundDistributionResponse distributeFunds(Long budgetId,
     }
 
     FundDistribution distribution = FundDistribution.builder()
-            .schemeId(request.getSchemeId())
-            .schemeName(request.getSchemeName())
-            .citizenId(request.getCitizenId())
-            .beneficiaryName(request.getBeneficiaryName())
-            .amount(request.getAmount())
-            .budget(budget)
-            .build();
+        .schemeId(request.getSchemeId())
+        .schemeName(request.getSchemeName())
+        .citizenId(request.getCitizenId())
+        .beneficiaryName(request.getBeneficiaryName())
+        .amount(request.getAmount())
+        .paymentMode(request.getPaymentMode())
+        .remarks(request.getRemarks())
+        .budget(budget)
+        .build();
 
     FundDistribution saved = fundDistributionRepository.save(distribution);
 
@@ -208,14 +211,16 @@ public FundDistributionResponse distributeFunds(Long budgetId,
     budgetRepository.save(budget);
 
     return FundDistributionResponse.builder()
-            .id(saved.getId())
-            .schemeId(saved.getSchemeId())
-            .schemeName(saved.getSchemeName())
-            .citizenId(saved.getCitizenId())
-            .beneficiaryName(saved.getBeneficiaryName())
-            .amount(saved.getAmount())
-            .budgetId(budget.getId())
-            .build();
+        .id(saved.getId())
+        .schemeId(saved.getSchemeId())
+        .schemeName(saved.getSchemeName())
+        .citizenId(saved.getCitizenId())
+        .beneficiaryName(saved.getBeneficiaryName())
+        .amount(saved.getAmount())
+        .paymentMode(saved.getPaymentMode())
+        .remarks(saved.getRemarks())
+        .budgetId(budget.getId())
+        .build();
 }
 @Override
 public List<FundDistributionResponse> getFundDistributions(Long budgetId) {
@@ -229,6 +234,8 @@ public List<FundDistributionResponse> getFundDistributions(Long budgetId) {
                     .citizenId(distribution.getCitizenId())
                     .beneficiaryName(distribution.getBeneficiaryName())
                     .amount(distribution.getAmount())
+                    .paymentMode(distribution.getPaymentMode())
+                    .remarks(distribution.getRemarks())
                     .budgetId(distribution.getBudget().getId())
                     .build())
             .toList();
@@ -239,28 +246,24 @@ public DashboardResponse getDashboardSummary() {
     List<Budget> budgets = budgetRepository.findAll();
 
     double total = budgets.stream()
-        .map(Budget::getTotalBudget)
-        .filter(java.util.Objects::nonNull)
-        .mapToDouble(java.math.BigDecimal::doubleValue)
-        .sum();
+            .map(Budget::getTotalBudget)
+            .filter(java.util.Objects::nonNull)
+            .mapToDouble(java.math.BigDecimal::doubleValue)
+            .sum();
 
-double allocated = budgets.stream()
-        .map(Budget::getAllocatedAmount)
-        .filter(java.util.Objects::nonNull)
-        .mapToDouble(java.math.BigDecimal::doubleValue)
-        .sum();
+    double allocated = budgets.stream()
+            .map(Budget::getAllocatedAmount)
+            .filter(java.util.Objects::nonNull)
+            .mapToDouble(java.math.BigDecimal::doubleValue)
+            .sum();
 
-double spent = budgets.stream()
-        .map(Budget::getSpentAmount)
-        .filter(java.util.Objects::nonNull)
-        .mapToDouble(java.math.BigDecimal::doubleValue)
-        .sum();
+    double spent = budgets.stream()
+            .map(Budget::getSpentAmount)
+            .filter(java.util.Objects::nonNull)
+            .mapToDouble(java.math.BigDecimal::doubleValue)
+            .sum();
 
-double remaining = budgets.stream()
-        .map(Budget::getRemainingAmount)
-        .filter(java.util.Objects::nonNull)
-        .mapToDouble(java.math.BigDecimal::doubleValue)
-        .sum();
+    double remaining = total - allocated;
 
     return DashboardResponse.builder()
             .totalBudget(total)

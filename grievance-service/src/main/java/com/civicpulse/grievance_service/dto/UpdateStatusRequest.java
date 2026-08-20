@@ -1,7 +1,10 @@
 package com.civicpulse.grievance_service.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class UpdateStatusRequest {
 
+    @NotBlank(message = "Status is required")
     private String status;
 
     public UpdateStatusRequest() {
